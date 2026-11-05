@@ -214,7 +214,8 @@
       "id": "P5-2",
       "phase": 5,
       "name": "Hosted URL works from a fresh browser with no sign-up",
-      "passes": false
+      "passes": true,
+      "evidence": "6 Nov ~03:30 IST after deploy c824fb4: with no cookie, / returned 200 in 0.4 s and /api/estate created a fresh estate (Oct 21, no events, $14,440 safe) in 0.4 s. In a separate browser, the stop panel appeared 0.43 s after Send payment, two clicks from landing. Full money run in a fresh browser was done on 5 Nov."
     },
     {
       "id": "P5-3",

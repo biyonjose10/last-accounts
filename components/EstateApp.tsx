@@ -36,7 +36,8 @@ const big = (cents: number) => (cents % 100 === 0 ? `$${(cents / 100).toLocaleSt
 /** The page's opening sentence: what can go to the family today, then what's holding the rest. */
 function headline(safe: number, owed: number, held: number, windowOpen: boolean, closes: string, allPaid: boolean): [string, string] {
   if (allPaid) return ["Everyone has been paid.", "The final account is ready."];
-  const lead = safe > 0 ? `${big(safe)} is safe to pay today.` : "Nothing is safe to pay yet.";
+  // While creditors are owed, the family's money waits behind them, so it isn't "today" yet.
+  const lead = safe <= 0 ? "Nothing is safe to pay yet." : owed > 0 ? `${big(safe)} is safe for the family.` : `${big(safe)} is safe to pay today.`;
   if (owed > 0 && held > 0) return [lead, `${big(owed + held)} waits for creditors and claims.`];
   if (held > 0) return [lead, windowOpen ? `${big(held)} is held until ${shortDate(closes)}.` : `${big(held)} is held for disputed claims.`];
   if (owed > 0) return [lead, `${big(owed)} goes to creditors first.`];

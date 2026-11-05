@@ -58,7 +58,7 @@ export function CashBridge({
     { key: "cash", label: "Cash in the estate", cents: cashCents, from: 0, to: cashCents, sign: "", connect: "top" },
     { key: "owed", label: "Owed to creditors", cents: owedCents, from: afterOwed, to: cashCents, sign: "−", connect: "bottom" },
     { key: "held", label: windowOpen ? "Held until claims close" : "Held for disputed claims", cents: heldCents, from: afterHeld, to: afterOwed, sign: "−", connect: "bottom" },
-    { key: "safe", label: "Safe to pay today", cents: safeCents, from: 0, to: safeCents, sign: "=", connect: null },
+    { key: "safe", label: owedCents > 0 ? "Safe for the family, after creditors" : "Safe to pay today", cents: safeCents, from: 0, to: safeCents, sign: "=", connect: null },
   ];
   const scale = Math.max(cashCents, owedCents + heldCents + safeCents, 1);
   const pct = (c: number) => `${(Math.max(0, c) / scale) * 100}%`;
