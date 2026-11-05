@@ -230,17 +230,20 @@ export function checkHeirPayment(plan: EstatePlan, heirId: string, requestedCent
       citation: CITE.federalPriority,
     });
   }
+  const safeLine = federalUnpaid.length > 0
+    ? `Once the tax is paid, ${usd(safe)} is safe.`
+    : `${usd(safe)} is safe today.`;
   if (requestedCents > safe && remaining > 0) {
     if (plan.windowOpen) {
       blocks.push({
         code: "CLAIM_WINDOW_OPEN",
-        message: `Creditors can still file claims until ${longDate(plan.windowClosesOn)}. If you pay this now and the money runs short, you could be held liable for the loss. ${usd(safe)} is safe today.`,
+        message: `Creditors can still file claims until ${longDate(plan.windowClosesOn)}. If you pay this now and the money runs short, you could be held liable for the loss. ${safeLine}`,
         citation: CITE.fiduciaryLiability,
       });
     } else {
       blocks.push({
         code: "UNPAID_PRIOR_CLASS",
-        message: `Claims and reserves come first. ${usd(safe)} is safe today.`,
+        message: `Claims and reserves come first. ${safeLine}`,
         citation: CITE.paymentOrder,
       });
     }

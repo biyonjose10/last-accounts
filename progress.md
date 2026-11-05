@@ -60,3 +60,8 @@ Everything below was run from sir's account against the sandbox.
 - Red team found two real gaps, both fixed: limits could be burned by refused requests (limits now count only after every check passes, and per visitor), and two different payments at once could overpay (an approval is now stale if money moved since it was issued).
 - Replay saved at fixtures/replay/run.json via scripts/export-replay.ts. Re-export after the final filmed run.
 - Still to do: capture-failure drill on hosted site (needs sir as Tom), exceed limits live, fresh browser check, README, APIMatic, video, Devpost.
+
+### 2026-11-06 early: clean clone
+- README followed on a fresh clone: install, tests, typecheck, build, token check, local run and the stop moment all work. Payouts not repeated locally to save sandbox balance.
+- Fixed a confusing stop message: with the tax unpaid it said "$6,220 is safe today" next to "nothing can go to Tom yet". It now says "Once the tax is paid, $6,220 is safe."
+- Sir asked to pause before the video and website screenshots: he wants to make changes first.

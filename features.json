@@ -247,7 +247,8 @@
       "id": "P6-2",
       "phase": 6,
       "name": "README followed on a clean clone",
-      "passes": false
+      "passes": true,
+      "evidence": "6 Nov 01:45 IST: fresh git clone of f877566, Node 22.18, npm ci (0 vulnerabilities), cp .env.example, 85 tests pass, typecheck and build clean, token step lists payouts, npm run dev on in-memory store loads the estate and the full-share payment to Tom is stopped with both citations. Payouts and the car sale were not repeated locally, to save the sandbox balance; the same code passed them on the hosted run. Note: next dev adds an untracked AGENTS.md to a fresh clone; harmless."
     },
     {
       "id": "P6-3",
