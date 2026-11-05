@@ -1,0 +1,42 @@
+{
+  "model": "gemini-3.5-flash",
+  "recordedAt": "2026-11-05T15:21:28.371Z",
+  "reading": {
+    "documentType": "appraisal",
+    "summary": "Certificate of appraisal issued by Pelican Row Vehicle Appraisals for a 2019 5-door gray hatchback belonging to the Estate of Ruth Calloway. The vehicle was appraised at $14,400.00 on August 24, 2026.",
+    "facts": [
+      {
+        "label": "Appraised Fair Market Value",
+        "value": "$14,400.00",
+        "quote": "$14,400.00"
+      },
+      {
+        "label": "Prepared For",
+        "value": "Estate of Ruth Calloway",
+        "quote": "Estate of Ruth Calloway"
+      },
+      {
+        "label": "Requested By",
+        "value": "Dana Calloway, Personal Representative",
+        "quote": "Dana Calloway, Personal Representative"
+      },
+      {
+        "label": "Vehicle",
+        "value": "2019 hatchback",
+        "quote": "2019 hatchback"
+      },
+      {
+        "label": "Appraisal Date",
+        "value": "24 Aug 2026",
+        "quote": "24 Aug 2026"
+      },
+      {
+        "label": "Appraiser",
+        "value": "Everett Sallow, Appraiser",
+        "quote": "Everett Sallow, Appraiser"
+      }
+    ],
+    "claim": null,
+    "instructionsToSoftware": []
+  }
+}

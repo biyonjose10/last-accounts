@@ -1,6 +1,7 @@
 // Rebuilds the estate from its events. Nothing is stored except what happened.
 
 import { planEstate } from "@/lib/engine/plan";
+import { windowCloses } from "@/lib/engine/rules-fl";
 import type { Claim, EstateFacts, EstatePlan } from "@/lib/engine/types";
 import { START_DATE, claims as seedClaims, estate as seedEstate } from "@/fixtures/scenario";
 import type { LedgerEvent } from "./store";
@@ -43,6 +44,8 @@ export interface EstateState {
   facts: EstateFacts;
   claims: Claim[];
   plan: EstatePlan;
+  /** Set aside for transfer fees on the final payments. Shown as part of cash, and as held back. */
+  feeReserveCents: number;
   payments: PaymentRecord[];
   orders: OrderRecord[];
   events: LedgerEvent[];
@@ -79,6 +82,9 @@ export function buildState(events: LedgerEvent[]): EstateState {
         break;
       case "claim_added":
         claims = claims.filter((c) => c.id !== e.data.claim.id).concat(e.data.claim);
+        break;
+      case "claim_released":
+        claims = claims.filter((c) => c.id !== e.data.claimId);
         break;
       case "payment_requested": {
         const p: PaymentRecord = { ...e.data, status: "requested", feeCents: 0 };
@@ -153,10 +159,13 @@ export function buildState(events: LedgerEvent[]): EstateState {
     }
   }
 
-  // Hold back the transfer fee on each payment still to come, so sums stay honest.
+  // Once the window closes the last payments can empty the estate, so their transfer fees are set aside.
+  // Before that, the prudence margin already covers them.
+  const windowClosed = asOf > windowCloses(seedEstate.noticePublishedOn);
+  const feeReserve = windowClosed ? Math.min(cash, seedEstate.heirs.length * PAYOUT_FEE_CENTS) : 0;
   const facts: EstateFacts = {
     ...seedEstate,
-    cashCents: Math.max(0, cash - seedEstate.heirs.length * PAYOUT_FEE_CENTS),
+    cashCents: cash - feeReserve,
     otherAssets,
     distributedCents: distributed,
   };
@@ -167,6 +176,7 @@ export function buildState(events: LedgerEvent[]): EstateState {
     facts,
     claims,
     plan: planEstate(facts, claims, asOf),
+    feeReserveCents: feeReserve,
     payments: [...payments.values()],
     orders: [...orders.values()],
     events,

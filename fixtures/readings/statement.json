@@ -1,0 +1,42 @@
+{
+  "model": "gemini-3.5-flash",
+  "recordedAt": "2026-11-05T15:21:23.847Z",
+  "reading": {
+    "documentType": "bank_statement",
+    "summary": "Bank statement from Gulfline Community Bank for the Estate Checking account ending in 7719 for the Estate of Ruth Calloway, Dana Calloway, Personal Representative, covering the period from 28 Aug 2026 to 30 Sep 2026. The ending balance is $197,600.00.",
+    "facts": [
+      {
+        "label": "Account Owner",
+        "value": "Estate of Ruth Calloway",
+        "quote": "Estate of Ruth Calloway"
+      },
+      {
+        "label": "Personal Representative",
+        "value": "Dana Calloway",
+        "quote": "Dana Calloway, Personal Representative"
+      },
+      {
+        "label": "Account Type and Number",
+        "value": "Estate Checking ending in 7719",
+        "quote": "Account ending 7719\nEstate Checking"
+      },
+      {
+        "label": "Statement Period",
+        "value": "28 Aug 2026 to 30 Sep 2026",
+        "quote": "Statement period: 28 Aug 2026 to 30 Sep 2026"
+      },
+      {
+        "label": "Ending Balance",
+        "value": "$197,600.00",
+        "quote": "Ending balance, 30 Sep 2026 $197,600.00"
+      },
+      {
+        "label": "Bank Name",
+        "value": "Gulfline Community Bank",
+        "quote": "Gulfline Community Bank"
+      }
+    ],
+    "claim": null,
+    "instructionsToSoftware": []
+  }
+}

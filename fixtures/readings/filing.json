@@ -1,0 +1,65 @@
+{
+  "model": "gemini-3.5-flash",
+  "recordedAt": "2026-11-05T15:22:03.467Z",
+  "reading": {
+    "documentType": "creditor_claim",
+    "summary": "A Notice of Fee from the Clerk of Court, Probate Division in Tampa, Florida, demanding $95.00 for 5 certified copies of letters of administration for the Estate of Ruth Calloway.",
+    "facts": [
+      {
+        "label": "Notice Number",
+        "value": "CC-77152",
+        "quote": "Notice no. CC-77152"
+      },
+      {
+        "label": "File Number",
+        "value": "2026-CP-004417",
+        "quote": "File no. 2026-CP-004417"
+      },
+      {
+        "label": "Estate Name",
+        "value": "Ruth Calloway",
+        "quote": "Estate of Ruth Calloway"
+      },
+      {
+        "label": "Recipient",
+        "value": "Dana Calloway, P.R.",
+        "quote": "To Dana Calloway, P.R."
+      },
+      {
+        "label": "Service Provided",
+        "value": "Certified copies of letters of administration (5 copies at $19.00)",
+        "quote": "Certified copies of letters of administration\n5 copies at $19.00 $95.00"
+      },
+      {
+        "label": "Total Fee Due",
+        "value": "$95.00",
+        "quote": "FEE DUE $95.00"
+      }
+    ],
+    "claim": {
+      "creditor": "Clerk of Court, Probate Division, Tampa, Florida",
+      "statedAmount": "95.00",
+      "statedAmountQuote": "$95.00",
+      "category": "administration",
+      "dateOnDocument": "2026-10-06",
+      "namesTheDeceased": true,
+      "citesCaseOrInvoiceNumber": true,
+      "namesOriginalCreditor": true,
+      "givesAccountDetails": true,
+      "demandsUrgentPayment": false,
+      "asksForUnusualPaymentRoute": false
+    },
+    "instructionsToSoftware": []
+  },
+  "triage": {
+    "triage": "valid",
+    "reasons": [
+      "The letter names the deceased and cites a specific case or invoice number.",
+      "The document comes from an expected administration source and provides account details without pressure or unusual demands."
+    ]
+  },
+  "action": {
+    "action": "pay_administration_cost",
+    "reason": "The claim is a valid probate court filing fee from an expected administration source with proper case details."
+  }
+}

@@ -1,0 +1,173 @@
+/* The money timeline: Bryntum's stock theme, ruled over to match the court ledger.
+   No Font Awesome: this chart is read-only and shows no icons. */
+@import "@bryntum/scheduler-community/scheduler.css";
+@import "@bryntum/scheduler-community/svalbard.css";
+
+.money-timeline .section-note { margin: 8px 0 12px; }
+
+.money-timeline-chart {
+  height: 340px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+/* Paper, ink and rules everywhere. No rounding, gradients, shadows or transitions. */
+.money-timeline-chart .b-scheduler {
+  --b-sch-event-border-radius: 0;
+  --b-widget-font-family: var(--font-body), system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+.money-timeline-chart .b-scheduler *,
+.money-timeline-chart .b-scheduler *::before,
+.money-timeline-chart .b-scheduler *::after {
+  box-shadow: none;
+  transition: none;
+  animation: none;
+}
+.money-timeline-chart .b-grid-body-container,
+.money-timeline-chart .b-grid-vertical-scroller,
+.money-timeline-chart .b-grid-sub-grid,
+.money-timeline-chart .b-grid-row,
+.money-timeline-chart .b-grid-row:hover,
+.money-timeline-chart .b-grid-row.b-selected,
+.money-timeline-chart .b-grid-cell,
+.money-timeline-chart .b-grid-cell:hover,
+.money-timeline-chart .b-sch-timeaxis-cell {
+  background: transparent;
+  color: var(--ink);
+}
+.money-timeline-chart .b-grid-header-container,
+.money-timeline-chart .b-grid-headers,
+.money-timeline-chart .b-grid-header,
+.money-timeline-chart .b-grid-header:hover,
+.money-timeline-chart .b-sch-header-time-axis-cell,
+.money-timeline-chart .b-sch-header-time-axis-cell:hover {
+  background: var(--paper);
+  color: var(--muted);
+}
+
+/* Rules */
+.money-timeline-chart .b-grid-row { border-bottom: 1px solid var(--rule); }
+.money-timeline-chart .b-grid-header-container { border-bottom: 1px solid var(--ink); }
+.money-timeline-chart .b-grid-splitter,
+.money-timeline-chart .b-grid-splitter:hover { background: var(--rule); flex-basis: 1px; width: 1px; }
+.money-timeline-chart .b-grid-header,
+.money-timeline-chart .b-sch-header-time-axis-cell,
+.money-timeline-chart .b-sch-header-row,
+.money-timeline-chart .b-grid-cell { border-color: var(--rule); }
+.money-timeline-chart .b-column-line,
+.money-timeline-chart .b-column-line-major { border-color: var(--rule); background: transparent; opacity: 0.55; }
+
+/* The header: one empty row for our labels, one row of dates. */
+.money-timeline-chart .b-grid-header-text { padding: 0; }
+.money-timeline-chart .b-grid-header { font-size: 12px; font-weight: 500; }
+.money-timeline-chart .b-sch-time-axis-column { position: relative; min-height: 0; padding: 0; }
+.money-timeline-chart .b-sch-header-row { flex: none; height: 22px; min-height: 0; }
+.money-timeline-chart .b-sch-header-text {
+  font-family: var(--font-figures), monospace;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Who */
+.money-timeline-chart .mt-who { padding: 0 8px 0 0; font-size: 13px; line-height: 1.15; }
+.money-timeline-chart .b-grid-header:first-child { padding-left: 0; }
+
+/* The bars. Amounts stay in the figures face. */
+.money-timeline-chart .b-sch-event-wrap,
+.money-timeline-chart .b-sch-event-wrap:hover { opacity: 1; }
+.money-timeline-chart .b-sch-event-wrap .b-sch-event,
+.money-timeline-chart .b-sch-event-wrap .b-sch-event:hover,
+.money-timeline-chart .b-sch-event-wrap.b-sch-event-selected .b-sch-event,
+.money-timeline-chart .b-sch-event-wrap.b-active .b-sch-event {
+  border-radius: 0;
+  border: 0;
+  outline: 0;
+  font-family: var(--font-figures), monospace;
+  font-size: 11px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+  filter: none;
+  padding: 0;
+}
+.money-timeline-chart .b-sch-event-content {
+  padding: 0 6px;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font: inherit;
+  color: inherit;
+}
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-paid,
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-paid:hover { background: #1e7a5a; color: #fff; }
+/* Ink on Held: white on this amber falls short of AA contrast. */
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-held,
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-held:hover { background: #c08a1e; color: var(--ink); }
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-owed,
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-owed:hover { background: #4f5f59; color: #fff; }
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-stop,
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-stop:hover { background: #8e2b36; color: #fff; }
+/* Ruled, not filled: money on its way, and a claim the law no longer binds. */
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-sent,
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-sent:hover { background: var(--paper); color: #1e7a5a; outline: 1px solid #1e7a5a; outline-offset: -1px; }
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-barred,
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-barred:hover { background: var(--paper); color: #8e2b36; outline: 1px solid #8e2b36; outline-offset: -1px; }
+
+/* The shared band and the Today line. Band sits under the bars, the line over them. */
+.mt-band,
+.mt-today,
+.mt-band-head,
+.mt-today-head { position: absolute; pointer-events: none; }
+.mt-band { top: 0; bottom: 0; background: rgb(20 35 31 / 0.06); z-index: 1; }
+.mt-today { top: 0; bottom: 0; width: 0; border-left: 1.5px solid var(--ink); z-index: 200; }
+.mt-band-head {
+  top: 0;
+  height: 22px;
+  padding: 0 6px;
+  overflow: hidden;
+  background: rgb(20 35 31 / 0.06);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 22px;
+  white-space: nowrap;
+  z-index: 2;
+}
+.mt-today-head {
+  top: 0;
+  bottom: 0;
+  padding-left: 5px;
+  border-left: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 22px;
+  white-space: nowrap;
+  z-index: 3;
+}
+.mt-today-head.mt-flip { padding: 0 5px 0 0; border-left: 0; border-right: 1.5px solid var(--ink); transform: translateX(-100%); }
+
+/* Tooltip */
+.b-sch-event-tooltip,
+.b-sch-event-tooltip .b-panel-content {
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 13px;
+}
+.b-sch-event-tooltip { border: 1px solid var(--ink); }
+
+@media (max-width: 760px) {
+  /* Long creditor names wrap to two lines. Bryntum sets the cell's line height to the row height. */
+  .money-timeline-chart .b-grid-cell.mt-who { display: flex; align-items: center; font-size: 12px; white-space: normal; line-height: 1.15 !important; }
+}

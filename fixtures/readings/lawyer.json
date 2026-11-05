@@ -1,0 +1,54 @@
+{
+  "model": "gemini-3.5-flash",
+  "recordedAt": "2026-11-05T15:21:33.389Z",
+  "reading": {
+    "documentType": "creditor_claim",
+    "summary": "This document is an invoice (Invoice no. 2026-118) dated 1 Sep 2026 from the Law Office of Imelda Quarrington to Dana Calloway, Personal Representative for the Estate of Ruth Calloway. It bills for probate attorney fees, filing costs, publishing costs, and postage totaling $3,850.00.",
+    "facts": [
+      {
+        "label": "Invoice Number",
+        "value": "2026-118",
+        "quote": "Invoice no. 2026-118"
+      },
+      {
+        "label": "Creditor Name",
+        "value": "Law Office of Imelda Quarrington",
+        "quote": "Law Office of Imelda Quarrington"
+      },
+      {
+        "label": "Estate/Deceased Name",
+        "value": "Estate of Ruth Calloway",
+        "quote": "Estate of Ruth Calloway"
+      },
+      {
+        "label": "Personal Representative",
+        "value": "Dana Calloway",
+        "quote": "Dana Calloway, Personal Representative"
+      },
+      {
+        "label": "Services Rendered",
+        "value": "Probate attorney and filing costs",
+        "quote": "For: Probate attorney and filing costs, Estate of Ruth Calloway"
+      },
+      {
+        "label": "Total Due",
+        "value": "$3,850.00",
+        "quote": "Total due $3,850.00"
+      }
+    ],
+    "claim": {
+      "creditor": "Law Office of Imelda Quarrington",
+      "statedAmount": "3850.00",
+      "statedAmountQuote": "$3,850.00",
+      "category": "administration",
+      "dateOnDocument": "2026-09-01",
+      "namesTheDeceased": true,
+      "citesCaseOrInvoiceNumber": true,
+      "namesOriginalCreditor": true,
+      "givesAccountDetails": false,
+      "demandsUrgentPayment": false,
+      "asksForUnusualPaymentRoute": false
+    },
+    "instructionsToSoftware": []
+  }
+}

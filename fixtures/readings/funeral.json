@@ -1,0 +1,54 @@
+{
+  "model": "gemini-3.5-flash",
+  "recordedAt": "2026-11-05T15:21:37.098Z",
+  "reading": {
+    "documentType": "creditor_claim",
+    "summary": "This document is an itemised statement of goods and services from Bayview Funeral Home dated September 10, 2026. It details expenses totaling $8,240.00 for funeral services for Ruth Calloway, addressed to Dana Calloway, Personal Representative of the Estate.",
+    "facts": [
+      {
+        "label": "Provider",
+        "value": "Bayview Funeral Home",
+        "quote": "Bayview Funeral Home"
+      },
+      {
+        "label": "Statement Date",
+        "value": "September 10, 2026",
+        "quote": "Statement date: 10 Sep 2026"
+      },
+      {
+        "label": "Deceased",
+        "value": "Ruth Calloway",
+        "quote": "In care of: Ruth Calloway"
+      },
+      {
+        "label": "Responsible Party",
+        "value": "Dana Calloway, Personal Representative of the Estate",
+        "quote": "Responsible party: Dana Calloway, Personal Representative of the Estate"
+      },
+      {
+        "label": "Total Amount Due",
+        "value": "$8,240.00",
+        "quote": "Total $8,240.00"
+      },
+      {
+        "label": "Payment Note",
+        "value": "Balance is payable by the estate of the deceased",
+        "quote": "Balance is payable by the estate of the deceased."
+      }
+    ],
+    "claim": {
+      "creditor": "Bayview Funeral Home",
+      "statedAmount": "8240.00",
+      "statedAmountQuote": "Total $8,240.00",
+      "category": "funeral",
+      "dateOnDocument": "2026-09-10",
+      "namesTheDeceased": true,
+      "citesCaseOrInvoiceNumber": false,
+      "namesOriginalCreditor": true,
+      "givesAccountDetails": false,
+      "demandsUrgentPayment": false,
+      "asksForUnusualPaymentRoute": false
+    },
+    "instructionsToSoftware": []
+  }
+}

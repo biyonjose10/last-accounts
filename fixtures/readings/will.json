@@ -1,0 +1,42 @@
+{
+  "model": "gemini-3.5-flash",
+  "recordedAt": "2026-11-05T15:21:19.542Z",
+  "reading": {
+    "documentType": "will",
+    "summary": "Last Will and Testament of Ruth Calloway, declaring residence in Tampa, Florida. She nominates her daughter Dana Calloway as Personal Representative without bond, bequeaths $10,000 to her niece Aoife Calloway, and leaves the residue of her estate equally to her children Dana Calloway and Tom Calloway. Signed on June 12, 2019.",
+    "facts": [
+      {
+        "label": "Testator",
+        "value": "Ruth Calloway",
+        "quote": "I, Ruth Calloway, a resident of Tampa, Florida, being of sound mind, declare this to be my Last Will and Testament"
+      },
+      {
+        "label": "Personal Representative",
+        "value": "Dana Calloway",
+        "quote": "I name my daughter, Dana Calloway, as Personal Representative of my estate, to serve without bond."
+      },
+      {
+        "label": "Monetary Bequest",
+        "value": "$10,000 to Aoife Calloway",
+        "quote": "I give the sum of Ten Thousand Dollars ($10,000.00) to my niece, Aoife Calloway, of Cork, Ireland."
+      },
+      {
+        "label": "Residuary Beneficiaries",
+        "value": "Dana Calloway and Tom Calloway",
+        "quote": "I give all the rest, residue and remainder of my estate, in equal shares, to my daughter, Dana Calloway, and my son, Tom Calloway."
+      },
+      {
+        "label": "Execution Date",
+        "value": "June 12, 2019",
+        "quote": "Signed at Tampa, Florida, on the 12th day of June, 2019"
+      },
+      {
+        "label": "Witnesses",
+        "value": "Harlan Pennick and June Abernethy",
+        "quote": "Harlan Pennick\nWitness, Tampa, Florida\n\nJune Abernethy\nWitness, Tampa, Florida"
+      }
+    ],
+    "claim": null,
+    "instructionsToSoftware": []
+  }
+}

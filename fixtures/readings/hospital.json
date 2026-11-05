@@ -1,0 +1,54 @@
+{
+  "model": "gemini-3.5-flash",
+  "recordedAt": "2026-11-05T15:21:46.143Z",
+  "reading": {
+    "documentType": "creditor_claim",
+    "summary": "A Statement of Claim Against Estate issued by St. Brendan Hospital for patient Ruth Calloway (deceased). The total claim amount is $12,600.00 covering inpatient care, palliative care, medication, supplies, and physician services during the last 60 days of life, from January 15, 2026 to March 14, 2026.",
+    "facts": [
+      {
+        "label": "Patient Name",
+        "value": "Ruth Calloway, deceased",
+        "quote": "Ruth Calloway, deceased"
+      },
+      {
+        "label": "Date of Death",
+        "value": "14 Mar 2026",
+        "quote": "14 Mar 2026"
+      },
+      {
+        "label": "Hospital Account Number",
+        "value": "SB-2026-30771",
+        "quote": "SB-2026-30771"
+      },
+      {
+        "label": "Dates of Care",
+        "value": "15 Jan 2026 to 14 Mar 2026",
+        "quote": "15 Jan 2026 to 14 Mar 2026"
+      },
+      {
+        "label": "Personal Representative",
+        "value": "Dana Calloway",
+        "quote": "Dana Calloway, Personal Representative"
+      },
+      {
+        "label": "Total Claim Amount",
+        "value": "$12,600.00",
+        "quote": "$12,600.00"
+      }
+    ],
+    "claim": {
+      "creditor": "St. Brendan Hospital",
+      "statedAmount": "12600.00",
+      "statedAmountQuote": "$12,600.00",
+      "category": "last_illness",
+      "dateOnDocument": "2026-09-18",
+      "namesTheDeceased": true,
+      "citesCaseOrInvoiceNumber": true,
+      "namesOriginalCreditor": true,
+      "givesAccountDetails": true,
+      "demandsUrgentPayment": false,
+      "asksForUnusualPaymentRoute": false
+    },
+    "instructionsToSoftware": []
+  }
+}

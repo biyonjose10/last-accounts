@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Harbor Credit Card balance claim</title>
+<style>
+html, body { margin: 0; padding: 0; background: #fff; }
+.page { width: 1100px; min-height: 1424px; box-sizing: border-box; position: relative;
+  background: #fff; color: #000; overflow: hidden; }
+.page::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  box-shadow: inset 0 0 26px rgba(0,0,0,.07);
+  background-image:
+    radial-gradient(circle, rgba(0,0,0,.45) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(0,0,0,.35) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(0,0,0,.4) 0 1px, transparent 1.5px);
+  background-size: 3px 3px; background-repeat: no-repeat; }
+table { border-collapse: collapse; }
+.stamp { position: absolute; border: 3px solid #111; color: #111; padding: 7px 14px;
+  font: 700 19px/1.1 "Courier New", Courier, monospace; letter-spacing: 1px;
+  transform: rotate(-4deg); white-space: nowrap; }
+
+.page { padding: 60px 74px; font: 17px/1.55 Consolas, "Lucida Console", monospace; }
+.lh { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 44px; }
+.lh b { font: 700 30px/1 "Trebuchet MS", Arial, sans-serif; display: block; margin-bottom: 8px; }
+.stamp { top: 138px; right: 74px; }
+h1 { font: 700 21px/1.3 Consolas, "Lucida Console", monospace; margin: 40px 0 14px; padding: 7px 10px; border: 1px solid #000; }
+table { width: 100%; }
+td { padding: 6px 0; }
+.num { text-align: right; }
+tr.total td { font-weight: 700; font-size: 21px; border-top: 1px solid #000; padding-top: 10px; }
+p { margin: 22px 0; }
+.slip { margin-top: 90px; border-top: 2px dashed #000; padding-top: 22px; }
+.slip small { display: block; font-size: 14px; margin-bottom: 14px; }
+.page::after { background-position: 25px 807px, 1073px 1027px, 807px 1415px; }</style>
+</head>
+<body><div class="page">
+<div class="lh"><div><b>Harbor Credit Card</b>Estate Claims Unit<br>PO Box 4410, Tampa, Florida<br>813-555-0188</div></div>
+<div class="stamp">RECEIVED 22 SEP 2026</div>
+<div>ESTATE OF RUTH CALLOWAY<br>C/O DANA CALLOWAY, PERSONAL REPRESENTATIVE<br>TAMPA, FLORIDA</div>
+<h1>BALANCE CLAIM AGAINST DECEASED CARDHOLDER'S ESTATE</h1>
+<table>
+<tr><td>Cardholder</td><td class="num">Ruth Calloway</td></tr>
+<tr><td>Account ending</td><td class="num">2048</td></tr>
+<tr><td>Claim prepared</td><td class="num">18 Sep 2026</td></tr>
+<tr><td>Balance at date of death, 14 Mar 2026</td><td class="num">$4,112.60</td></tr>
+<tr><td>Interest and fees since date of death</td><td class="num">$197.40</td></tr>
+<tr class="total"><td>Total balance claimed</td><td class="num">$4,310.00</td></tr>
+</table>
+<p>The account was closed on notice of the cardholder's death. No further charges have been posted. Account statements for the past 12 months are available from the Estate Claims Unit on request.</p>
+<div class="slip">
+<small>Detach and return with payment</small>
+<table>
+<tr><td>Harbor Credit Card, Estate Claims Unit</td><td class="num">Account ending 2048</td></tr>
+<tr><td>Estate of Ruth Calloway</td><td class="num">Amount: $4,310.00</td></tr>
+</table>
+</div>
+</div></body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "model": "gemini-3.5-flash",
+  "recordedAt": "2026-11-05T15:21:50.402Z",
+  "reading": {
+    "documentType": "creditor_claim",
+    "summary": "A creditor claim from Harbor Credit Card's Estate Claims Unit against the Estate of Ruth Calloway for an outstanding credit card balance totaling $4,310.00. The claim was prepared on 18 Sep 2026 and includes a balance at date of death of $4,112.60 plus interest and fees since date of death of $197.40.",
+    "facts": [
+      {
+        "label": "Deceased Cardholder",
+        "value": "Ruth Calloway",
+        "quote": "Cardholder Ruth Calloway"
+      },
+      {
+        "label": "Account Ending",
+        "value": "2048",
+        "quote": "Account ending 2048"
+      },
+      {
+        "label": "Date of Death",
+        "value": "14 Mar 2026",
+        "quote": "Balance at date of death, 14 Mar 2026"
+      },
+      {
+        "label": "Balance at Date of Death",
+        "value": "$4,112.60",
+        "quote": "Balance at date of death, 14 Mar 2026 $4,112.60"
+      },
+      {
+        "label": "Interest and Fees",
+        "value": "$197.40",
+        "quote": "Interest and fees since date of death $197.40"
+      },
+      {
+        "label": "Total Balance Claimed",
+        "value": "$4,310.00",
+        "quote": "Total balance claimed $4,310.00"
+      }
+    ],
+    "claim": {
+      "creditor": "Harbor Credit Card",
+      "statedAmount": "4310.00",
+      "statedAmountQuote": "Total balance claimed $4,310.00",
+      "category": "other",
+      "dateOnDocument": "2026-09-18",
+      "namesTheDeceased": true,
+      "citesCaseOrInvoiceNumber": true,
+      "namesOriginalCreditor": true,
+      "givesAccountDetails": true,
+      "demandsUrgentPayment": false,
+      "asksForUnusualPaymentRoute": false
+    },
+    "instructionsToSoftware": []
+  }
+}
