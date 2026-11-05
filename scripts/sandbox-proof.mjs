@@ -1,6 +1,6 @@
 // Phase 0 go/no-go: proves the PayPal sandbox works from this account.
 // Run: node --env-file=.env scripts/sandbox-proof.mjs <command>
-// Commands: token | balances | order | capture <orderId> | payout <amount> | payout-status <batchId>
+// Commands: token | balances | order | capture <orderId> | payout <amount> | payout-status <batchId> | get-order <orderId>
 //           | payout-repeat | mock-capture <orderId> | search
 // Sandbox only. Secrets are never printed. Results go to scripts/.proof/ (gitignored).
 
@@ -25,8 +25,25 @@ const record = (label, data) =>
     JSON.stringify({ at: new Date().toISOString(), label, data }) + "\n",
   );
 
+// A dropped connection never reached PayPal, so retrying it cannot pay twice.
+async function fetchRetry(url, options, tries = 4) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await fetch(url, options);
+    } catch (err) {
+      const code = err.cause?.code ?? "";
+      const connectFailed = /CONNECT_TIMEOUT|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN/.test(code);
+      if (!connectFailed || attempt >= tries) throw err;
+      console.error(`Connection problem (${code}), retry ${attempt}/${tries - 1}`);
+      await new Promise((r) => setTimeout(r, 1500 * attempt));
+    }
+  }
+}
+
+let cachedToken;
 async function token() {
-  const res = await fetch(`${BASE}/v1/oauth2/token`, {
+  if (cachedToken) return cachedToken;
+  const res = await fetchRetry(`${BASE}/v1/oauth2/token`, {
     method: "POST",
     headers: {
       Authorization: `Basic ${Buffer.from(`${ID}:${SECRET}`).toString("base64")}`,
@@ -36,12 +53,13 @@ async function token() {
   });
   const body = await res.json();
   if (!res.ok) throw new Error(`token failed ${res.status}: ${body.error_description ?? body.error}`);
-  return { accessToken: body.access_token, scopes: body.scope.split(" "), appId: body.app_id };
+  cachedToken = { accessToken: body.access_token, scopes: body.scope.split(" "), appId: body.app_id };
+  return cachedToken;
 }
 
 async function call(path, { method = "GET", body, headers = {} } = {}) {
   const { accessToken } = await token();
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetchRetry(`${BASE}${path}`, {
     method,
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -164,6 +182,28 @@ switch (command) {
     show("payout-repeat-2", await call("/v1/payments/payouts", { method: "POST", body: payoutBody("1.00", id) }));
     break;
   }
+  case "topup": {
+    // Refills the sandbox estate with PayPal's published sandbox test card. Fake money only.
+    const result = await call("/v2/checkout/orders", {
+      method: "POST",
+      headers: { "PayPal-Request-Id": randomUUID() },
+      body: {
+        intent: "CAPTURE",
+        purchase_units: [{ amount: { currency_code: "USD", value: Number(arg ?? "100").toFixed(2) }, description: "Sandbox balance refill" }],
+        payment_source: {
+          card: { number: "4111111111111111", expiry: "2030-12", security_code: "123", name: "Sandbox Refill" },
+        },
+      },
+    });
+    record("topup", { status: result.status, id: result.json.id, state: result.json.status, name: result.json.name, details: result.json.details });
+    console.log("topup HTTP", result.status, result.json.id ?? "", result.json.status ?? result.json.name ?? "", JSON.stringify(result.json.details ?? ""));
+    const caps = (result.json.purchase_units ?? []).flatMap((u) => u.payments?.captures ?? []);
+    console.log(caps.map((c) => [c.id, c.status, c.amount.value, c.seller_receivable_breakdown?.paypal_fee?.value]));
+    break;
+  }
+  case "get-order":
+    show("get-order", await call(`/v2/checkout/orders/${arg}`));
+    break;
   case "payout-status":
     show("payout-status", await call(`/v1/payments/payouts/${arg}`));
     break;

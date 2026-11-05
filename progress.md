@@ -22,3 +22,23 @@ Resume here: read PLAN.md, this file, features.json, then `git log`.
 ### 2026-11-05: Phase 0 started
 - Project created. `scripts/sandbox-proof.mjs` written, not yet run.
 - Waiting on sir: PayPal developer account, sandbox accounts, keys in `.env`.
+
+### 2026-11-05: Phase 0 sandbox proof
+Everything below was run from sir's account against the sandbox.
+
+**Works**
+- Dashboard access from India. Default sandbox accounts are IN, so we made US ones: Estate (business), Tom (personal). App name is "Estate Ledger" because PayPal bans "account" in app names.
+- Order, buyer approval, capture. Simulated decline with `PayPal-Mock-Response`. Payouts, duplicate rejection.
+- Card-funded orders complete with no buyer approval. `sandbox-proof.mjs topup <amount>` refills the Estate. Test card only, fake money.
+
+**Traps found**
+- Balance form refuses $100,000 or more.
+- Balances and Transaction Search lag. They showed $5,000 and a refresh time before the account's activity. Never show them as live. Build accounting from each payout's and order's own GET response; use reporting only as a later cross-check.
+- Repeat capture returns 201 with the SAME capture ID. Check the capture ID; a success code alone doesn't prove anything.
+- Payout fee was a flat $0.25 at $25, $1 and $6,000. Order fees are percentage-based (about 2.59% + $0.49 on the $25,000 card order). The engine must count fees.
+- PayPal returned one 500 on a card order; the next succeeded. Node fetch also had two connect timeouts. Retry with the same `PayPal-Request-Id` or `sender_batch_id`.
+- Sandbox login form ignores scripted values. Real keystrokes work.
+
+**Still to do in Phase 0:** recheck Balances and Transaction Search; Dana and Aoife accounts before the final-batch phase.
+
+**Sir still owes:** Tom's and Estate's passwords stay in his own note; they go in the judges' instructions only for Tom.

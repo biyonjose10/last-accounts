@@ -1,53 +1,258 @@
 {
   "_note": "passes stays false until verified by running it. Never edit a test to make one pass.",
   "features": [
-    { "id": "P0-1", "phase": 0, "name": "Sandbox order created, approved and captured from sir's account", "passes": false },
-    { "id": "P0-2", "phase": 0, "name": "Sandbox Payouts batch completes and shows in the sandbox", "passes": false },
-    { "id": "P0-3", "phase": 0, "name": "Repeated sender_batch_id does not pay twice", "passes": false },
-    { "id": "P0-4", "phase": 0, "name": "Balances API returns the estate balance", "passes": false },
-    { "id": "P0-5", "phase": 0, "name": "Transaction Search returns the proof transactions", "passes": false },
-    { "id": "P0-6", "phase": 0, "name": "Mock capture failure returns a declined error", "passes": false },
-    { "id": "P0-7", "phase": 0, "name": "Sandbox balance large enough for the demo until 15 Dec", "passes": false },
-    { "id": "P0-8", "phase": 0, "name": "Single payout at the demo amount is accepted", "passes": false },
-
-    { "id": "P1-1", "phase": 1, "name": "Payment classes and $6,000 funeral cap match 733.707", "passes": false },
-    { "id": "P1-2", "phase": 1, "name": "Claim window follows 733.702", "passes": false },
-    { "id": "P1-3", "phase": 1, "name": "Gift reduction order follows 733.805", "passes": false },
-    { "id": "P1-4", "phase": 1, "name": "Every block cites its statute", "passes": false },
-    { "id": "P1-5", "phase": 1, "name": "Florida attorney rule checked and pitch wording confirmed", "passes": false },
-
-    { "id": "P2-1", "phase": 2, "name": "Overpayment attempt is blocked and offers the safe amount", "passes": false },
-    { "id": "P2-2", "phase": 2, "name": "Approved safe amount sends a real payout, PayPal ID shown", "passes": false },
-    { "id": "P2-3", "phase": 2, "name": "Double click on approve pays only once", "passes": false },
-    { "id": "P2-4", "phase": 2, "name": "Agent auto-pay refuses above its $500 and $1,000 limits", "passes": false },
-    { "id": "P2-5", "phase": 2, "name": "Ledger is append-only; corrections are struck through", "passes": false },
-    { "id": "P2-6", "phase": 2, "name": "Failed payout leaves the item owed", "passes": false },
-
-    { "id": "P3-1", "phase": 3, "name": "Live Gemini read of a document returns validated facts", "passes": false },
-    { "id": "P3-2", "phase": 3, "name": "A quote absent from the document is marked unverified", "passes": false },
-    { "id": "P3-3", "phase": 3, "name": "AI output cannot set an amount", "passes": false },
-    { "id": "P3-4", "phase": 3, "name": "Fake debt letter is reserved and never paid", "passes": false },
-    { "id": "P3-5", "phase": 3, "name": "Injection text in a letter is ignored and logged", "passes": false },
-    { "id": "P3-6", "phase": 3, "name": "AI failure falls back and money stays held", "passes": false },
-
-    { "id": "P4-1", "phase": 4, "name": "Car buyout captured through JS SDK v6 checkout", "passes": false },
-    { "id": "P4-2", "phase": 4, "name": "Buyer cancel returns the car and recalculates", "passes": false },
-    { "id": "P4-3", "phase": 4, "name": "Capture failure gives no credit and offers retry", "passes": false },
-    { "id": "P4-4", "phase": 4, "name": "Real webhook received and signature verified", "passes": false },
-
-    { "id": "P5-1", "phase": 5, "name": "Bryntum money timeline shows real ledger data", "passes": false },
-    { "id": "P5-2", "phase": 5, "name": "Hosted URL works from a fresh browser with no sign-up", "passes": false },
-    { "id": "P5-3", "phase": 5, "name": "Per-visitor limit blocks when exceeded", "passes": false },
-    { "id": "P5-4", "phase": 5, "name": "Daily cap switches to a labelled replay of a real run", "passes": false },
-    { "id": "P5-5", "phase": 5, "name": "Full flow to final batch completes on the hosted URL", "passes": false },
-
-    { "id": "P6-1", "phase": 6, "name": "Final accounting is built from PayPal records with IDs", "passes": false },
-    { "id": "P6-2", "phase": 6, "name": "README followed on a clean clone", "passes": false },
-    { "id": "P6-3", "phase": 6, "name": "Licence shows on the GitHub repo page", "passes": false },
-    { "id": "P6-4", "phase": 6, "name": "Leak-checker clean on full history", "passes": false },
-    { "id": "P6-5", "phase": 6, "name": "APIMatic plugin use is real and documented", "passes": false },
-
-    { "id": "P7-1", "phase": 7, "name": "Video under 3:00 with every claim checked against the build", "passes": false },
-    { "id": "P8-1", "phase": 8, "name": "Live rules and submission form checked item by item", "passes": false }
+    {
+      "id": "P0-1",
+      "phase": 0,
+      "name": "Sandbox order created, approved and captured from sir's account",
+      "passes": true,
+      "evidence": "Order 5GC37379U7344261C captured as 6KX44452087018949 on 5 Nov"
+    },
+    {
+      "id": "P0-2",
+      "phase": 0,
+      "name": "Sandbox Payouts batch completes and shows in the sandbox",
+      "passes": true,
+      "evidence": "Batches G5Y7A7N6MRH96, MMYU8GPLL8PU6, GBJJL9Y7Q4BPA all SUCCESS"
+    },
+    {
+      "id": "P0-3",
+      "phase": 0,
+      "name": "Repeated sender_batch_id does not pay twice",
+      "passes": true,
+      "evidence": "Repeat sender_batch_id returned HTTP 400; repeat capture returned the same capture ID, one capture on the order"
+    },
+    {
+      "id": "P0-4",
+      "phase": 0,
+      "name": "Balances API returns the estate balance",
+      "passes": false,
+      "note": "API answers, but showed $5,000 with a stale refresh time on 5 Nov. Recheck later."
+    },
+    {
+      "id": "P0-5",
+      "phase": 0,
+      "name": "Transaction Search returns the proof transactions",
+      "passes": false,
+      "note": "API answers, but proof transactions not yet listed. Recheck later."
+    },
+    {
+      "id": "P0-6",
+      "phase": 0,
+      "name": "Mock capture failure returns a declined error",
+      "passes": true,
+      "evidence": "PayPal-Mock-Response returned 422 INSTRUMENT_DECLINED"
+    },
+    {
+      "id": "P0-7",
+      "phase": 0,
+      "name": "Sandbox balance large enough for the demo until 15 Dec",
+      "passes": true,
+      "evidence": "Balance form caps below $100,000, but card-funded orders refill without approval: $25,000 and $60,000 completed"
+    },
+    {
+      "id": "P0-8",
+      "phase": 0,
+      "name": "Single payout at the demo amount is accepted",
+      "passes": false
+    },
+    {
+      "id": "P1-1",
+      "phase": 1,
+      "name": "Payment classes and $6,000 funeral cap match 733.707",
+      "passes": false
+    },
+    {
+      "id": "P1-2",
+      "phase": 1,
+      "name": "Claim window follows 733.702",
+      "passes": false
+    },
+    {
+      "id": "P1-3",
+      "phase": 1,
+      "name": "Gift reduction order follows 733.805",
+      "passes": false
+    },
+    {
+      "id": "P1-4",
+      "phase": 1,
+      "name": "Every block cites its statute",
+      "passes": false
+    },
+    {
+      "id": "P1-5",
+      "phase": 1,
+      "name": "Florida attorney rule checked and pitch wording confirmed",
+      "passes": false
+    },
+    {
+      "id": "P2-1",
+      "phase": 2,
+      "name": "Overpayment attempt is blocked and offers the safe amount",
+      "passes": false
+    },
+    {
+      "id": "P2-2",
+      "phase": 2,
+      "name": "Approved safe amount sends a real payout, PayPal ID shown",
+      "passes": false
+    },
+    {
+      "id": "P2-3",
+      "phase": 2,
+      "name": "Double click on approve pays only once",
+      "passes": false
+    },
+    {
+      "id": "P2-4",
+      "phase": 2,
+      "name": "Agent auto-pay refuses above its $500 and $1,000 limits",
+      "passes": false
+    },
+    {
+      "id": "P2-5",
+      "phase": 2,
+      "name": "Ledger is append-only; corrections are struck through",
+      "passes": false
+    },
+    {
+      "id": "P2-6",
+      "phase": 2,
+      "name": "Failed payout leaves the item owed",
+      "passes": false
+    },
+    {
+      "id": "P3-1",
+      "phase": 3,
+      "name": "Live Gemini read of a document returns validated facts",
+      "passes": false
+    },
+    {
+      "id": "P3-2",
+      "phase": 3,
+      "name": "A quote absent from the document is marked unverified",
+      "passes": false
+    },
+    {
+      "id": "P3-3",
+      "phase": 3,
+      "name": "AI output cannot set an amount",
+      "passes": false
+    },
+    {
+      "id": "P3-4",
+      "phase": 3,
+      "name": "Fake debt letter is reserved and never paid",
+      "passes": false
+    },
+    {
+      "id": "P3-5",
+      "phase": 3,
+      "name": "Injection text in a letter is ignored and logged",
+      "passes": false
+    },
+    {
+      "id": "P3-6",
+      "phase": 3,
+      "name": "AI failure falls back and money stays held",
+      "passes": false
+    },
+    {
+      "id": "P4-1",
+      "phase": 4,
+      "name": "Car buyout captured through JS SDK v6 checkout",
+      "passes": false
+    },
+    {
+      "id": "P4-2",
+      "phase": 4,
+      "name": "Buyer cancel returns the car and recalculates",
+      "passes": false
+    },
+    {
+      "id": "P4-3",
+      "phase": 4,
+      "name": "Capture failure gives no credit and offers retry",
+      "passes": false
+    },
+    {
+      "id": "P4-4",
+      "phase": 4,
+      "name": "Real webhook received and signature verified",
+      "passes": false
+    },
+    {
+      "id": "P5-1",
+      "phase": 5,
+      "name": "Bryntum money timeline shows real ledger data",
+      "passes": false
+    },
+    {
+      "id": "P5-2",
+      "phase": 5,
+      "name": "Hosted URL works from a fresh browser with no sign-up",
+      "passes": false
+    },
+    {
+      "id": "P5-3",
+      "phase": 5,
+      "name": "Per-visitor limit blocks when exceeded",
+      "passes": false
+    },
+    {
+      "id": "P5-4",
+      "phase": 5,
+      "name": "Daily cap switches to a labelled replay of a real run",
+      "passes": false
+    },
+    {
+      "id": "P5-5",
+      "phase": 5,
+      "name": "Full flow to final batch completes on the hosted URL",
+      "passes": false
+    },
+    {
+      "id": "P6-1",
+      "phase": 6,
+      "name": "Final accounting is built from PayPal records with IDs",
+      "passes": false
+    },
+    {
+      "id": "P6-2",
+      "phase": 6,
+      "name": "README followed on a clean clone",
+      "passes": false
+    },
+    {
+      "id": "P6-3",
+      "phase": 6,
+      "name": "Licence shows on the GitHub repo page",
+      "passes": false
+    },
+    {
+      "id": "P6-4",
+      "phase": 6,
+      "name": "Leak-checker clean on full history",
+      "passes": false
+    },
+    {
+      "id": "P6-5",
+      "phase": 6,
+      "name": "APIMatic plugin use is real and documented",
+      "passes": false
+    },
+    {
+      "id": "P7-1",
+      "phase": 7,
+      "name": "Video under 3:00 with every claim checked against the build",
+      "passes": false
+    },
+    {
+      "id": "P8-1",
+      "phase": 8,
+      "name": "Live rules and submission form checked item by item",
+      "passes": false
+    }
   ]
 }
