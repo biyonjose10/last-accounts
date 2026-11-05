@@ -1,22 +1,22 @@
-/* Last Accounts. A court ledger that explains itself: ruled lines for the record,
+/* Last Accounts. A court ledger that explains itself, on the pale green of an accountant's columnar pad: ruled lines for the record,
    panels for the answers, a yellow highlighter on the reason. Corrections are struck through, never erased.
    Motion only answers something the person did. */
 :root {
   --ink: #14231f;
-  --paper: #f3f5f2;
-  --panel: #ffffff;
-  --side: #e6ebe7;
-  --rule: #bcc8c2;
-  --edge: #d3dbd6;
+  --paper: #e3ece0;
+  --panel: #f3f7f1;
+  --side: #d4dfd1;
+  --rule: #b7c7b4;
+  --edge: #c9d6c6;
   --muted: #4f5f59;
   --owed: #5b6c66;
   --paid: #1e7a5a;
-  --paid-tint: #dcefe6;
+  --paid-tint: #c9e5d4;
   --paid-deep: #155c43;
   --held: #c08a1e;
   --held-text: #80590f;
   --stop: #8e2b36;
-  --stop-tint: #f3dde0;
+  --stop-tint: #f1d6da;
   --marker: #e2b53b;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
@@ -74,7 +74,7 @@ a { color: inherit; }
 .simulated { font-family: var(--font-figures); font-size: 12px; background: var(--ink); color: var(--paper); padding: 2px 8px; border-radius: 6px; }
 
 /* ---------- Choices that slide ---------- */
-.segmented { position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: #dfe6e2; }
+.segmented { position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: #cfdbcb; }
 .segmented button {
   position: relative; z-index: 1; height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent;
   font: inherit; font-size: 14px; font-weight: 500; color: var(--ink); cursor: pointer; transition: color 220ms var(--ease);
@@ -234,7 +234,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .reasons li { max-width: 66ch; padding: 10px 0; border-top: 1px solid var(--rule); font-size: 15px; }
 .reasons li:first-child { border-top: 0; }
 .cite { display: block; margin-top: 4px; font-family: var(--font-figures); font-size: 12px; color: var(--muted); }
-.verdict-do { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 20px 22px; background: #f1f4f2; border-left: 1px solid var(--edge); }
+.verdict-do { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 20px 22px; background: #e8efe5; border-left: 1px solid var(--edge); }
 .verdict-do-title { margin: 0; font-size: 13px; font-weight: 600; color: var(--muted); }
 .suggestion { margin: 0; padding: 12px 14px; border-radius: 12px; background: rgb(226 181 59 / 0.3); font-size: 15.5px; line-height: 1.4; }
 .verdict-do .primary { white-space: normal; height: auto; min-height: 44px; padding: 10px 20px; text-align: left; }
@@ -245,7 +245,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 .notice p { flex: 1 1 320px; margin: 0; }
 .notice.ok { background: var(--paid-tint); color: #12402f; }
-.notice.fail { background: #f6ecd6; color: #5e420b; }
+.notice.fail { background: #f2e4c4; color: #5e420b; }
 .notice.stop { display: block; background: var(--stop-tint); color: #5b1a22; }
 .notice.stop p + p, .notice.stop blockquote + p { margin-top: 8px; }
 
