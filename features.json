@@ -173,7 +173,8 @@
       "id": "P3-6",
       "phase": 3,
       "name": "AI failure falls back and money stays held",
-      "passes": false
+      "passes": true,
+      "evidence": "Hosted URL 5 Nov: AI off drill used saved reading, triage needs_proof, no money moved"
     },
     {
       "id": "P4-1",

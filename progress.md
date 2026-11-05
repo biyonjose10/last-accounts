@@ -46,3 +46,10 @@ Everything below was run from sir's account against the sandbox.
 **Design result:** the estate was cut from about $212,000 to about $52,800 so a full run fits in one fill, with two full runs per fill. Car-sale cash counts in the ledger, but isn't spendable in the sandbox, which is fine because the balance stays well above it.
 
 **Sir still owes:** Tom's and Estate's passwords stay in his own note; they go in the judges' instructions only for Tom.
+
+### 2026-11-05 night: deployed
+- Live: https://last-accounts.vercel.app (Vercel project last-accounts; deploy with `npx --yes vercel@65.5.0 --prod --yes`, no auto-deploy).
+- Database: Neon `last-accounts-db`, created through the Vercel integration; DATABASE_URL lives in Vercel and .env.local.
+- PayPal webhook registered at /api/webhook; ID in Vercel and .env.
+- PayPal dashboard sessions expire quickly. Refill the Estate with the pencil on its sandbox account page; it must be under $100,000.
+- Still to do: sir's car test as Tom, record fixtures/replay/run.json from a real run, final account on real data, webhook seen arriving.
