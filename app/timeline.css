@@ -171,3 +171,8 @@
   /* Long creditor names wrap to two lines. Bryntum sets the cell's line height to the row height. */
   .money-timeline-chart .b-grid-cell.mt-who { display: flex; align-items: center; font-size: 12px; white-space: normal; line-height: 1.15 !important; }
 }
+
+/* Paid and sent bars open their receipt. */
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-clickable,
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-clickable:hover { cursor: pointer; }
+.money-timeline-chart .b-sch-event-wrap .b-sch-event.mt-clickable:hover { filter: brightness(1.12); }

@@ -11,6 +11,7 @@ import { Guide } from "./Guide";
 import { MoneyTimeline } from "./MoneyTimeline";
 import { Paperwork } from "./Paperwork";
 import { CashBridge } from "./CashBridge";
+import { MoneyWent } from "./MoneyWent";
 import { Segmented } from "./Segmented";
 import { Shell, type NavItem } from "./Shell";
 import { PaidBadge, Receipt, type ReceiptRef } from "./Receipt";
@@ -285,7 +286,11 @@ export function EstateApp({ clientId }: { clientId: string }) {
         <h1 className="headline">
           <span>{lead}</span> <mark>{reason}</mark>
         </h1>
-        <CashBridge cashCents={cash} owedCents={plan.owedCents} heldCents={reserved} safeCents={plan.distributableNowCents} windowOpen={plan.windowOpen} />
+        {allPaid ? (
+          <MoneyWent state={state} onOpen={setReceipt} />
+        ) : (
+          <CashBridge cashCents={cash} owedCents={plan.owedCents} heldCents={reserved} safeCents={plan.distributableNowCents} windowOpen={plan.windowOpen} />
+        )}
         <Guide state={state} />
       </header>
 
@@ -432,7 +437,7 @@ export function EstateApp({ clientId }: { clientId: string }) {
 
       <section id="timeline" aria-labelledby="timeline-heading">
         <div className="section-head"><h2 id="timeline-heading">Who gets paid, and when</h2></div>
-        <MoneyTimeline state={state} />
+        <MoneyTimeline state={state} onOpenReceipt={setReceipt} />
       </section>
 
       <CarSale state={state} clientId={clientId} simulateDecline={drills.declineNextCapture} onChange={refresh} onReceipt={(orderId) => setReceipt({ orderId })} />

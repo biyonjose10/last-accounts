@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usd } from "@/lib/ledger/describe";
 import type { EstateState } from "@/lib/ledger/state";
+import { AgentLimits } from "./AgentLimits";
 
 interface DocEntry {
   id: string;
@@ -82,6 +83,7 @@ export function Paperwork({ state, aiOff, onChange }: { state: EstateState; aiOf
       <p className="section-note">
         Gemini reads each page. Every fact has to quote the page, and we check the quote. It reads the paper, code decides the money. Please don&apos;t add real documents: this demo is for fictional ones.
       </p>
+      <AgentLimits state={state} />
       <div className="paper-grid">
         <div className="doc-lists">
           <p className="list-title">Arrived with the case</p>

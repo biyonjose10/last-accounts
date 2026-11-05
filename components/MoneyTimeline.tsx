@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Scheduler, ViewPresetConfig } from "@bryntum/scheduler-community";
 import { START_DATE } from "@/fixtures/scenario";
+import type { ReceiptRef } from "./Receipt";
 import { longDate, usd } from "@/lib/ledger/describe";
 import type { EstateState, Target } from "@/lib/ledger/state";
 import "@/app/timeline.css";
@@ -36,6 +37,8 @@ interface Bar {
   endDate: string;
   cls: string;
   tip: string;
+  /** Ledger entries behind a Paid or Sent bar. Only these bars open a receipt. */
+  ledgerIds?: string[];
 }
 
 interface Model {
@@ -87,14 +90,15 @@ function buildModel(state: EstateState): Model {
 
   // Money that moved, one bar per person per date. A Paid bar ends on the day it happened.
   const { requested, settled } = paymentDates(state);
-  const moved = new Map<string, { kind: "paid" | "sent"; row: string; payee: string; date: string; cents: number }>();
+  const moved = new Map<string, { kind: "paid" | "sent"; row: string; payee: string; date: string; cents: number; ledgerIds: string[] }>();
   for (const p of state.payments) {
     if (p.status === "failed") continue;
     const kind = p.status === "paid" ? "paid" : "sent";
     const date = (kind === "paid" ? settled.get(p.ledgerId) : undefined) ?? requested.get(p.ledgerId) ?? asOf;
     const key = `${kind}:${rowId(p.target)}:${date}`;
-    const entry = moved.get(key) ?? { kind, row: rowId(p.target), payee: p.payee, date, cents: 0 };
+    const entry = moved.get(key) ?? { kind, row: rowId(p.target), payee: p.payee, date, cents: 0, ledgerIds: [] };
     entry.cents += p.amountCents;
+    entry.ledgerIds.push(p.ledgerId);
     moved.set(key, entry);
   }
   for (const [id, m] of moved) {
@@ -104,7 +108,8 @@ function buildModel(state: EstateState): Model {
       name: `${m.kind === "paid" ? "Paid" : "Sent"} ${usd(m.cents)}`,
       startDate: noon(addDays(m.date, -LABEL_DAYS)),
       endDate: noon(m.date),
-      cls: m.kind === "paid" ? "mt-paid" : "mt-sent",
+      cls: `${m.kind === "paid" ? "mt-paid" : "mt-sent"} mt-clickable`,
+      ledgerIds: m.ledgerIds,
       tip:
         m.kind === "paid"
           ? `Paid ${usd(m.cents)} to ${m.payee} on ${longDate(m.date)}.`
@@ -257,13 +262,23 @@ const eventTooltip = {
   }),
 };
 
-export function MoneyTimeline({ state }: { state: EstateState }) {
+export function MoneyTimeline({
+  state,
+  onOpenReceipt,
+}: {
+  state: EstateState;
+  onOpenReceipt?: (ref: ReceiptRef) => void;
+}) {
   // Polling hands us a new state object every few seconds. Only real changes reach Bryntum.
   const signature = JSON.stringify(buildModel(state));
   const model = useMemo(() => JSON.parse(signature) as Model, [signature]);
 
   const modelRef = useRef(model);
   const schedulerRef = useRef<Scheduler | null>(null);
+  const openReceiptRef = useRef(onOpenReceipt);
+  useEffect(() => {
+    openReceiptRef.current = onOpenReceipt;
+  }, [onOpenReceipt]);
   const axisRef = useRef(`${model.axisStart}|${model.axisEnd}`);
   // Read once at mount. These only seed Bryntum's first render; later changes go through setTimeSpan.
   const [firstSpan] = useState(() => ({ start: new Date(model.axisStart), end: new Date(model.axisEnd) }));
@@ -277,6 +292,11 @@ export function MoneyTimeline({ state }: { state: EstateState }) {
     if (!scheduler) return;
     schedulerRef.current = scheduler;
     paintMarks(scheduler, modelRef.current);
+  }, []);
+
+  const eventClick = useCallback(({ eventRecord }: { eventRecord: { get: (field: string) => unknown } }) => {
+    const ids = eventRecord.get("ledgerIds");
+    if (Array.isArray(ids) && ids.length > 0) openReceiptRef.current?.({ ledgerIds: ids as string[] });
   }, []);
 
   useEffect(() => {
@@ -335,6 +355,7 @@ export function MoneyTimeline({ state }: { state: EstateState }) {
           stripeFeature={false}
           dependenciesFeature={false}
           eventTooltipFeature={eventTooltip}
+          onEventClick={eventClick}
           onPaint={repaint}
           onTimeAxisChange={repaint}
           onTimelineViewportResize={repaint}

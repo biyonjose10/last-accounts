@@ -3,6 +3,8 @@
 import { Shell } from "./Shell";
 import { useCallback, useEffect, useState } from "react";
 import { PaidBadge, Receipt, type ReceiptRef } from "./Receipt";
+import { MoneyWent } from "./MoneyWent";
+import { MoneyTimeline } from "./MoneyTimeline";
 import { describe, longDate, usd } from "@/lib/ledger/describe";
 import type { EstateState } from "@/lib/ledger/state";
 
@@ -40,6 +42,7 @@ export function ReplayView() {
           Estate of {state.facts.decedent}. Recorded{data.recordedAt ? ` on ${longDate(data.recordedAt.slice(0, 10))}` : ""}. Every PayPal ID below is from that real run in the sandbox, in the order it happened.
         </p>
         <h1 className="headline"><span>A real run, replayed.</span> <mark>Nothing here moves money.</mark></h1>
+        <MoneyWent state={state} onOpen={setReceipt} />
       </header>
       <section>
         <div className="section-head"><h2>Payments</h2></div>
@@ -66,6 +69,10 @@ export function ReplayView() {
             ))}
           </tbody>
         </table>
+      </section>
+      <section>
+        <div className="section-head"><h2>Who got paid, and when</h2></div>
+        <MoneyTimeline state={state} onOpenReceipt={setReceipt} />
       </section>
       <section>
         <div className="section-head"><h2>The record</h2></div>
