@@ -152,6 +152,15 @@ export function EstateApp({ clientId }: { clientId: string }) {
       const before = new Set(state?.payments.map((p) => p.ledgerId));
       const res = await post("/api/pay", { target, amountCents, token, version, drill: drill || drills.failNextPayout });
       if (drills.failNextPayout) setDrills((d) => ({ ...d, failNextPayout: false }));
+      // The safe figure can move by a few cents once PayPal settles earlier fees, or another payment moves money.
+      // The old approval is refused, so check again and offer the new figure instead of a bare failure.
+      if (!res.json.ok && (res.json.reason === "blocked" || res.json.reason === "stale")) {
+        await refresh();
+        const again = await post("/api/check", { target, amountCents: toCents(amount) || amountCents });
+        if (again.ok) setCheck(again.json);
+        setNotice({ kind: "fail", text: "The safe amount changed slightly while PayPal settled its fees, so that approval no longer matched. Nothing was sent. Here is the new figure." });
+        return;
+      }
       if (res.json.ok) {
         setNotice({ kind: "ok", text: `${usd(amountCents)} sent to ${heirLine?.name}. PayPal is confirming it below.` });
       } else {

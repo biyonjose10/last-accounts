@@ -68,6 +68,7 @@ export function CarSale({
   refresh.current = onChange;
   const showReceipt = useRef(onReceipt);
   showReceipt.current = onReceipt;
+  const declines = useRef(0);
 
   async function capture(orderId: string) {
     const res = await fetch("/api/order/capture", {
@@ -84,9 +85,12 @@ export function CarSale({
       return;
     } else {
       setRetryOrder(orderId);
+      declines.current += 1;
+      const again = declines.current > 1 ? ` Declined again (attempt ${declines.current}).` : "";
+      const hint = json.simulated ? " Turn off the decline drill below, then retry." : "";
       setMessage({
         kind: "fail",
-        text: `${json.simulated ? "Simulated decline. " : ""}${json.message}. No credit has been given, and the car stays in the estate for now.`,
+        text: `${json.simulated ? "Simulated decline. " : ""}${json.message}. No credit has been given, and the car stays in the estate for now.${again}${hint}`,
       });
     }
     await refresh.current();
@@ -140,7 +144,7 @@ export function CarSale({
     };
     // The SDK only needs setting up once, while the car is unsold.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [Boolean(car), clientId]);
+  }, [Boolean(car), Boolean(captured), clientId]);
 
   return (
     <section id="car" aria-labelledby="car-heading">
