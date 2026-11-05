@@ -34,6 +34,8 @@ export function describe(e: LedgerEvent): RecordLine | null {
       return { who: "Dana", text: `Released the reserve for ${d.creditor}: nothing was filed in court before the deadline.` };
     case "document_read":
       return { who: "Agent", text: d.via === "live" ? `Read "${d.title}" with Gemini.` : d.via === "saved" ? `AI not used for "${d.title}" (${d.failure ?? "saved"}). Used a saved reading from a real run.` : `Couldn't read "${d.title}": ${d.failure}. Waiting for Dana.` };
+    case "webhook_received":
+      return { who: "PayPal", text: `Signed event received and verified: ${d.eventType}.` };
     case "agent_note":
       return { who: "Agent", text: d.text };
     case "order_created":

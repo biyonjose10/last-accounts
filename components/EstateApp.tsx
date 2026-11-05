@@ -56,7 +56,7 @@ export function EstateApp({ clientId }: { clientId: string }) {
   const [payee, setPayee] = useState("tom");
   const [amount, setAmount] = useState("");
   const [check, setCheck] = useState<CheckResult | null>(null);
-  const [notice, setNotice] = useState<{ kind: "ok" | "fail"; text: string } | null>(null);
+  const [notice, setNotice] = useState<{ kind: "ok" | "fail"; text: string; replay?: boolean } | null>(null);
 
   const [drills, setDrills] = useState<Drills>({ failNextPayout: false, declineNextCapture: false, aiOff: false });
 
@@ -116,7 +116,10 @@ export function EstateApp({ clientId }: { clientId: string }) {
       } else {
         setNotice({
           kind: "fail",
-          text: `${res.json.simulated ? "Simulated failure. " : ""}${res.json.message ?? "That payment didn't go through."} Nothing was marked paid.`,
+          text: res.json.replay
+            ? res.json.message
+            : `${res.json.simulated ? "Simulated failure. " : ""}${res.json.message ?? "That payment didn't go through."} Nothing was marked paid.`,
+          replay: Boolean(res.json.replay),
         });
       }
       setCheck(null);
@@ -138,7 +141,11 @@ export function EstateApp({ clientId }: { clientId: string }) {
       setNotice(
         res.json.ok
           ? { kind: "ok", text: "Creditors paid in the order Florida law sets. PayPal is confirming them below." }
-          : { kind: "fail", text: res.json.blocks?.[0]?.message ?? res.json.result?.message ?? "Those payments didn't go through. Nothing was marked paid." },
+          : {
+              kind: "fail",
+              text: res.json.message ?? res.json.blocks?.[0]?.message ?? res.json.result?.message ?? "Those payments didn't go through. Nothing was marked paid.",
+              replay: Boolean(res.json.replay),
+            },
       );
       setAmount("");
       await refresh();
@@ -264,7 +271,10 @@ export function EstateApp({ clientId }: { clientId: string }) {
           </div>
         )}
 
-        {notice && <div className={notice.kind === "ok" ? "ok-panel" : "fail-panel"} role="status">{notice.text}</div>}
+        {notice && <div className={notice.kind === "ok" ? "ok-panel" : "fail-panel"} role="status">
+            {notice.text}
+            {notice.replay && <> <a href="/replay">Watch the replay</a></>}
+          </div>}
 
         <table className="ledger">
           <thead>
@@ -367,7 +377,9 @@ export function EstateApp({ clientId }: { clientId: string }) {
       <footer className="foot">
         <p>
           A hackathon demo using one state&apos;s rules, for use alongside a lawyer. It isn&apos;t legal advice, and the people in it don&apos;t exist.{" "}
-          <button className="link" onClick={reset} disabled={busy}>Start this estate again</button>
+          <button className="link" onClick={reset} disabled={busy}>Start this estate again</button>{" · "}
+          <a href="/accounting">Final account</a>{" · "}
+          <a href="/replay">Replay of a real run</a>
         </p>
       </footer>
     </main>

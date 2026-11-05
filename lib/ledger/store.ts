@@ -17,6 +17,8 @@ export interface Store {
   /** Adds one to a counter unless it has reached the limit. Returns false at the limit. */
   bump(counter: string, limit: number): Promise<boolean>;
   count(counter: string): Promise<number>;
+  /** Which estate a payment belongs to, for PayPal events that arrive on their own. */
+  findWorkspaceByLedger(ledgerIdPrefix: string): Promise<string | null>;
 }
 
 class MemoryStore implements Store {
@@ -43,6 +45,12 @@ class MemoryStore implements Store {
   }
   async count(counter: string) {
     return this.counters.get(counter) ?? 0;
+  }
+  async findWorkspaceByLedger(ledgerIdPrefix: string) {
+    for (const [workspace, list] of this.events) {
+      if (list.some((e) => e.type === "payment_requested" && String(e.data?.ledgerId ?? "").startsWith(ledgerIdPrefix))) return workspace;
+    }
+    return null;
   }
 }
 
@@ -91,6 +99,12 @@ class NeonStore implements Store {
     await this.init();
     const rows = await this.sql`SELECT n FROM counters WHERE name = ${counter}`;
     return rows[0] ? Number(rows[0].n) : 0;
+  }
+  async findWorkspaceByLedger(ledgerIdPrefix: string) {
+    await this.init();
+    const rows = await this.sql`SELECT workspace FROM ledger_events
+      WHERE type = 'payment_requested' AND data->>'ledgerId' LIKE ${`${ledgerIdPrefix}%`} LIMIT 1`;
+    return rows[0] ? String(rows[0].workspace) : null;
   }
 }
 
