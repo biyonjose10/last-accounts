@@ -1,9 +1,15 @@
 "use client";
 
-import Link from "next/link";
+import { Shell } from "./Shell";
 import { useEffect, useState } from "react";
 import { describe, longDate, usd } from "@/lib/ledger/describe";
 import type { EstateState } from "@/lib/ledger/state";
+
+const PAGES = [
+  { href: "/", label: "The estate" },
+  { href: "/accounting", label: "Final account" },
+  { href: "/replay", label: "Replay of a real run" },
+];
 
 /** Read-only view of a saved real run. Nothing here calls PayPal or the AI. */
 export function ReplayView() {
@@ -17,21 +23,20 @@ export function ReplayView() {
       .catch(() => setFailed(true));
   }, []);
 
-  if (failed) return <main className="sheet"><p>No replay has been recorded yet.</p></main>;
-  if (!data) return <main className="sheet"><p>Opening the replay…</p></main>;
+  if (failed) return <Shell nav={PAGES}><p className="empty">No replay has been recorded yet.</p></Shell>;
+  if (!data) return <Shell nav={PAGES}><p className="empty">Opening the replay…</p></Shell>;
   const { state } = data;
 
   return (
-    <main className="sheet">
-      <div className="bar">
-        <span><strong>Last Accounts</strong> · <Link href="/">Back to the live demo</Link></span>
+    <Shell nav={PAGES}>
+      <div className="topbar">
         <span className="simulated">Replay of a real sandbox run. Nothing moves.</span>
       </div>
-      <header className="masthead">
-        <h1>Estate of {state.facts.decedent}</h1>
-        <p>
-          Recorded{data.recordedAt ? ` on ${longDate(data.recordedAt.slice(0, 10))}` : ""}. Every PayPal ID below is from that real run in the sandbox. Each entry is what happened, in order.
+      <header className="hero">
+        <p className="hero-meta">
+          Estate of {state.facts.decedent}. Recorded{data.recordedAt ? ` on ${longDate(data.recordedAt.slice(0, 10))}` : ""}. Every PayPal ID below is from that real run in the sandbox, in the order it happened.
         </p>
+        <h1 className="headline"><span>A real run, replayed.</span> <mark>Nothing here moves money.</mark></h1>
       </header>
       <section>
         <div className="section-head"><h2>Payments</h2></div>
@@ -43,7 +48,7 @@ export function ReplayView() {
                 <td>{p.payee}</td>
                 <td className="num">{usd(p.amountCents)}</td>
                 <td>{p.auto ? "Agent, within limits" : "Dana"}</td>
-                <td><span className={p.status === "paid" ? "state paid" : "state stop"}>{p.status === "paid" ? "Paid" : p.status}</span></td>
+                <td><span className={p.status === "paid" ? "badge paid" : "badge stop"}>{p.status === "paid" ? "Paid" : p.status}</span></td>
                 <td className="id">{p.transactionId}</td>
               </tr>
             ))}
@@ -52,7 +57,7 @@ export function ReplayView() {
                 <td>From Tom Calloway, for the car</td>
                 <td className="num">{usd(o.grossCents)}</td>
                 <td>Tom, in PayPal Checkout</td>
-                <td><span className="state paid">Captured</span></td>
+                <td><span className="badge paid">Captured</span></td>
                 <td className="id">{o.captureId}</td>
               </tr>
             ))}
@@ -69,6 +74,6 @@ export function ReplayView() {
         </ol>
       </section>
       <footer className="foot"><p>A hackathon demo for use alongside a lawyer. It isn&apos;t legal advice, and the people in it don&apos;t exist.</p></footer>
-    </main>
+    </Shell>
   );
 }

@@ -65,3 +65,10 @@ Everything below was run from sir's account against the sandbox.
 - README followed on a fresh clone: install, tests, typecheck, build, token check, local run and the stop moment all work. Payouts not repeated locally to save sandbox balance.
 - Fixed a confusing stop message: with the tax unpaid it said "$6,220 is safe today" next to "nothing can go to Tom yet". It now says "Once the tax is paid, $6,220 is safe."
 - Sir asked to pause before the video and website screenshots: he wants to make changes first.
+
+### 2026-11-06 early: new design, after "because." (Design Nomad, Dribbble)
+- Sir chose the "because." treasury shot as the reference. Recreated in our own code, nothing bought or copied.
+- Sir's choices: hybrid colours (our cool paper, ink, green and red, plus a yellow highlighter #E2B53B), sidebar app, heavier display serif (Gloock), whole site.
+- New: sidebar that follows the section being read; headline sentence with the reason highlighted; a cash bridge (cash, minus creditors, minus held, equals safe); the stop shown as reasons plus a "What you can do" box; badges; a document pane that slides when you switch; switches for the fault drill.
+- Motion only answers a click or a change: sliding selectors, panels easing in, bars growing, ticks drawing. The strike-through stays. Reduced motion respected.
+- Checked locally in Chrome at desktop and phone width. Not yet deployed. DEMO.md shots need re-checking against the new look before filming.

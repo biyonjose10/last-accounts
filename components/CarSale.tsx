@@ -135,11 +135,11 @@ export function CarSale({
   }, [Boolean(car), clientId]);
 
   return (
-    <section aria-labelledby="car-heading">
+    <section id="car" aria-labelledby="car-heading">
       <div className="section-head"><h2 id="car-heading">Tom wants to keep the car</h2></div>
       {captured ? (
         <p className="section-note">
-          <span className="state paid">Sold to Tom.</span> {usd(captured.grossCents)} paid, {usd(captured.feeCents ?? 0)} PayPal fee, {usd(captured.netCents ?? 0)} reached the estate. Capture <span className="id">{captured.captureId}</span>
+          <span className="badge paid">Sold to Tom</span> {usd(captured.grossCents)} paid, {usd(captured.feeCents ?? 0)} PayPal fee, {usd(captured.netCents ?? 0)} reached the estate. Capture <span className="id">{captured.captureId}</span>
         </p>
       ) : (
         <>
@@ -155,9 +155,9 @@ export function CarSale({
           </div>
         </>
       )}
-      {message && <div className={message.kind === "ok" ? "ok-panel" : "fail-panel"} role="status">{message.text}</div>}
+      {message && <div className={`notice ${message.kind}`} role="status" key={message.text}><p>{message.text}</p></div>}
       {!captured && !message && failedOrder && lastOrder?.status === "capture_failed" && (
-        <div className="fail-panel">The last capture failed: {failedOrder.failure}. No credit was given.</div>
+        <div className="notice fail"><p>The last capture failed: {failedOrder.failure}. No credit was given.</p></div>
       )}
     </section>
   );

@@ -35,7 +35,13 @@ export function Guide({ state }: { state: EstateState }) {
       <ol>
         {steps.map((s, i) => (
           <li key={s.label} className={s.done ? "done" : i === next ? "next" : undefined}>
-            <a href={s.href}>{s.label}</a>
+            <a href={s.href}>
+              <span className="box" aria-hidden>
+                <svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" /></svg>
+              </span>
+              <span>{s.label}</span>
+              {s.done && <span className="visually-hidden"> (done)</span>}
+            </a>
           </li>
         ))}
       </ol>

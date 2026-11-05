@@ -1,43 +1,50 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import Link from "next/link";
+import { Shell } from "@/components/Shell";
 import { buildAccounting } from "@/lib/accounting";
 import { longDate, usd } from "@/lib/ledger/describe";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Final account, Last Accounts" };
 
+const PAGES = [
+  { href: "/", label: "The estate" },
+  { href: "/accounting", label: "Final account" },
+  { href: "/replay", label: "Replay of a real run" },
+];
+
 export default async function AccountingPage() {
   const workspace = (await cookies()).get("la_workspace")?.value;
   const account = workspace ? await buildAccounting(workspace) : null;
 
   return (
-    <main className="sheet">
-      <div className="bar">
-        <span><strong>Last Accounts</strong> · <Link href="/">Back to the ledger</Link></span>
-        <span className="sandbox-tag">PayPal sandbox. Fictional estate, fake money.</span>
-      </div>
+    <Shell nav={PAGES}>
       {!account || account.lines.length === 0 ? (
-        <header className="masthead"><h1>Final account</h1><p>Nothing has moved in this estate yet.</p></header>
+        <header className="hero">
+          <h1 className="headline"><span>Final account.</span> <mark>Nothing has moved yet.</mark></h1>
+          <p className="hero-meta">Pay someone on the estate page, and each payment will be read back from PayPal here.</p>
+        </header>
       ) : (
         <>
-          <header className="masthead">
-            <h1>Final account: estate of {account.decedent}</h1>
-            <p>
-              Every line below was read back from PayPal just now, for Dana&apos;s lawyer to review.{" "}
-              {account.allMatch ? "All lines match the ledger." : "Some lines don't match the ledger yet. See the status column."}
-            </p>
-            <div className="date-row">
-              <span>As of <strong>{longDate(account.asOf)}</strong></span>
+          <div className="topbar">
+            <p className="today">
+              As of <strong>{longDate(account.asOf)}</strong>
               {account.simulatedDate && <span className="simulated">Simulated date</span>}
-            </div>
-          </header>
-          <div className="totals" aria-label="Totals from PayPal">
-            <div className="total"><h3>Paid out</h3><span className="figure">{usd(account.totals.outCents)}</span></div>
-            <div className="total"><h3>Received</h3><span className="figure">{usd(account.totals.inCents)}</span></div>
-            <div className="total"><h3>PayPal fees</h3><span className="figure">{usd(account.totals.feesCents)}</span></div>
-            <div className="total safe"><h3>Left in the estate</h3><span className="figure">{usd(account.totals.cashLeftCents)}</span></div>
+            </p>
           </div>
+          <header className="hero">
+            <p className="hero-meta">Final account for the estate of {account.decedent}, for Dana&apos;s lawyer to review. Every line below was read back from PayPal just now.</p>
+            <h1 className="headline">
+              <span>{usd(account.totals.outCents)} paid out.</span>{" "}
+              <mark>{account.allMatch ? "Every line matches PayPal." : "Some lines don't match PayPal yet."}</mark>
+            </h1>
+            <dl className="totals" aria-label="Totals from PayPal">
+              <div><dt>Paid out</dt><dd className="figure">{usd(account.totals.outCents)}</dd></div>
+              <div><dt>Received</dt><dd className="figure">{usd(account.totals.inCents)}</dd></div>
+              <div><dt>PayPal fees</dt><dd className="figure">{usd(account.totals.feesCents)}</dd></div>
+              <div className="safe"><dt>Left in the estate</dt><dd className="figure">{usd(account.totals.cashLeftCents)}</dd></div>
+            </dl>
+          </header>
           <section>
             <table className="ledger">
               <thead>
@@ -51,7 +58,7 @@ export default async function AccountingPage() {
                     <td className="num">{l.paypalCents === null ? "Not read" : usd(l.paypalCents)}</td>
                     <td className="num hide-sm">{usd(l.feeCents)}</td>
                     <td className="id">{l.paypalId ?? "None yet"}</td>
-                    <td><span className={l.matches ? "state paid" : "state held"}>{l.paypalStatus.toLowerCase()}</span></td>
+                    <td><span className={l.matches ? "badge paid" : "badge held"}>{l.paypalStatus.toLowerCase()}</span></td>
                   </tr>
                 ))}
               </tbody>
@@ -60,6 +67,6 @@ export default async function AccountingPage() {
         </>
       )}
       <footer className="foot"><p>A hackathon demo for use alongside a lawyer. It isn&apos;t legal advice, and the people in it don&apos;t exist.</p></footer>
-    </main>
+    </Shell>
   );
 }

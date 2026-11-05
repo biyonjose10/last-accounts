@@ -10,6 +10,36 @@ import { Figure } from "./Figure";
 import { Guide } from "./Guide";
 import { MoneyTimeline } from "./MoneyTimeline";
 import { Paperwork } from "./Paperwork";
+import { CashBridge } from "./CashBridge";
+import { Segmented } from "./Segmented";
+import { Shell, type NavItem } from "./Shell";
+
+const NAV: NavItem[] = [
+  { href: "#overview", label: "Overview" },
+  { href: "#pay", label: "Pay an heir" },
+  { href: "#creditors", label: "Creditors" },
+  { href: "#timeline", label: "Timeline" },
+  { href: "#car", label: "The car" },
+  { href: "#paperwork", label: "Paperwork" },
+  { href: "#drill", label: "Fault drill" },
+  { href: "#record", label: "Record" },
+];
+
+const shortDate = (iso: string) =>
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+
+/** Whole dollars when there are no cents, for the headline. */
+const big = (cents: number) => (cents % 100 === 0 ? `$${(cents / 100).toLocaleString("en-US")}` : usd(cents));
+
+/** The page's opening sentence: what can go to the family today, then what's holding the rest. */
+function headline(safe: number, owed: number, held: number, windowOpen: boolean, closes: string, allPaid: boolean): [string, string] {
+  if (allPaid) return ["Everyone has been paid.", "The final account is ready."];
+  const lead = safe > 0 ? `${big(safe)} is safe to pay today.` : "Nothing is safe to pay yet.";
+  if (owed > 0 && held > 0) return [lead, `${big(owed + held)} waits for creditors and claims.`];
+  if (held > 0) return [lead, windowOpen ? `${big(held)} is held until ${shortDate(closes)}.` : `${big(held)} is held for disputed claims.`];
+  if (owed > 0) return [lead, `${big(owed)} goes to creditors first.`];
+  return [lead, "Nothing else is holding it back."];
+}
 
 type CheckResult = PaymentCheck & { version: number; token: string | null; safeToken: string | null };
 
@@ -44,9 +74,9 @@ function Citation({ block }: { block: Block }) {
 
 function PaymentState({ payment }: { payment?: PaymentRecord }) {
   if (!payment) return null;
-  if (payment.status === "paid") return <span className="state paid">Paid</span>;
-  if (payment.status === "failed") return <span className="state stop">Failed, still owed</span>;
-  return <span className="state waiting">{payment.paypalStatus ? `PayPal: ${payment.paypalStatus.toLowerCase()}` : "Sent to PayPal"}</span>;
+  if (payment.status === "paid") return <span className="badge paid">Paid</span>;
+  if (payment.status === "failed") return <span className="badge stop">Failed, still owed</span>;
+  return <span className="badge sent">{payment.paypalStatus ? `PayPal: ${payment.paypalStatus.toLowerCase()}` : "Sent to PayPal"}</span>;
 }
 
 export function EstateApp({ clientId }: { clientId: string }) {
@@ -183,90 +213,109 @@ export function EstateApp({ clientId }: { clientId: string }) {
     setBusy(false);
   }
 
-  if (error && !state) return <main className="sheet"><p className="state stop">{error}</p></main>;
-  if (!state) return <main className="sheet"><p>Opening the ledger…</p></main>;
+  if (error && !state) return <main className="page"><p className="state stop">{error}</p></main>;
+  if (!state) return <main className="page loading"><p>Opening the ledger…</p></main>;
 
   const { plan } = state;
   const reserved = plan.disputedReserveCents + plan.contingencyReserveCents + state.feeReserveCents;
+  const cash = plan.cashCents + state.feeReserveCents;
   const paymentFor = (t: Target) =>
     [...state.payments].reverse().find((p) => p.target.kind === t.kind && p.target.id === t.id);
   const unpaidClaimIds = [...new Set(plan.claimLines.filter((l) => l.status === "payable" && l.owedCents > 0).map((l) => l.claimId))];
   const records = state.events.map((e) => ({ e, line: describe(e) })).filter((r) => r.line).reverse();
+  const allPaid = plan.owedCents === 0 && plan.heirs.every((h) => h.entitledCents > 0 && h.distributedCents >= h.entitledCents);
+  const [lead, reason] = headline(plan.distributableNowCents, plan.owedCents, reserved, plan.windowOpen, plan.windowClosesOn, allPaid);
+  const first = (name?: string) => name?.split(" ")[0] ?? "";
 
   return (
-    <main className="sheet">
-      <div className="bar">
-        <span><strong>Last Accounts</strong> · For the person settling an estate, alongside their lawyer. Not legal advice.</span>
-        <span className="sandbox-tag">PayPal sandbox. Fictional estate, fake money.</span>
+    <Shell
+      nav={NAV}
+      pages={[{ href: "/accounting", label: "Final account" }, { href: "/replay", label: "Replay of a real run" }]}
+      footer={<button className="link" onClick={reset} disabled={busy}>Start this estate again</button>}
+    >
+      <div className="topbar">
+        <Segmented
+          label="Date"
+          value={plan.windowOpen ? "open" : "closed"}
+          disabled={busy}
+          onChange={(v) => { if (v === "closed") advanceDate(); }}
+          options={[
+            { value: "open", label: "Window open", disabled: !plan.windowOpen, title: plan.windowOpen ? undefined : "Start the estate again to go back" },
+            { value: "closed", label: "After the window (simulated)" },
+          ]}
+        />
+        <p className="today">
+          Today is <strong>{longDate(state.asOf)}</strong>
+          {state.simulatedDate && <span className="simulated">Simulated date</span>}
+        </p>
       </div>
 
-      <header className="masthead">
-        <h1>Estate of {state.facts.decedent}</h1>
-        <p>Dana Calloway, personal representative. Florida. Died {longDate(state.facts.dateOfDeath)}.</p>
-        <div className="date-row">
-          <span>Today: <strong>{longDate(state.asOf)}</strong></span>
-          {state.simulatedDate && <span className="simulated">Simulated date</span>}
-          <span>
-            {plan.windowOpen
-              ? `Creditors can file claims until ${longDate(plan.windowClosesOn)}.`
-              : `The creditor window closed on ${longDate(plan.windowClosesOn)}.`}
-          </span>
-          {plan.windowOpen && (
-            <button className="link" onClick={advanceDate} disabled={busy}>
-              Simulate: jump past the window
-            </button>
-          )}
-        </div>
+      <header id="overview" className="hero">
+        <p className="hero-meta">
+          Estate of {state.facts.decedent}, Florida. Died {longDate(state.facts.dateOfDeath)}. Dana Calloway is the personal representative.{" "}
+          {plan.windowOpen
+            ? `Creditors can file claims until ${longDate(plan.windowClosesOn)}.`
+            : `The creditor window closed on ${longDate(plan.windowClosesOn)}.`}
+        </p>
+        <h1 className="headline">
+          <span>{lead}</span> <mark>{reason}</mark>
+        </h1>
+        <CashBridge cashCents={cash} owedCents={plan.owedCents} heldCents={reserved} safeCents={plan.distributableNowCents} windowOpen={plan.windowOpen} />
+        <Guide state={state} />
       </header>
 
-      <div className="totals" aria-label="Estate totals">
-        <div className="total"><h3>Cash in the estate</h3><Figure cents={plan.cashCents + state.feeReserveCents} /></div>
-        <div className="total"><h3>Owed to creditors</h3><Figure cents={plan.owedCents} /></div>
-        <div className="total"><h3>Held back</h3><Figure cents={reserved} /></div>
-        <div className="total safe"><h3>Safe to distribute today</h3><Figure cents={plan.distributableNowCents} /></div>
-      </div>
-
-      <Guide state={state} />
-
-      <section aria-labelledby="send-heading">
+      <section id="pay" aria-labelledby="send-heading">
         <div className="section-head"><h2 id="send-heading">Pay an heir</h2></div>
         <div className="send">
           <div>
-            <label htmlFor="payee">Who</label>
-            <select id="payee" value={payee} onChange={(e) => { setPayee(e.target.value); setAmount(""); setCheck(null); }}>
-              {state.facts.heirs.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
-            </select>
+            <span className="field-label">Who</span>
+            <Segmented
+              label="Who"
+              value={payee}
+              disabled={busy}
+              onChange={(v) => { setPayee(v); setAmount(""); setCheck(null); }}
+              options={state.facts.heirs.map((h) => ({ value: h.id, label: first(h.name) }))}
+            />
           </div>
-          <div>
-            <label htmlFor="amount">Amount, USD</label>
+          <div className="amount-field">
+            <label htmlFor="amount" className="field-label">Amount, USD</label>
             <input id="amount" className="amount" type="text" inputMode="decimal" value={amount} onChange={(e) => { setAmount(e.target.value); setCheck(null); }} />
           </div>
           <button className="primary" onClick={tryPayment} disabled={busy || toCents(amount) === 0}>Send payment</button>
         </div>
 
         {check && !check.allowed && (
-          <div className="stop-panel" role="alert">
-            <h3>Stop. This could put the money on you.</h3>
-            <ul>
-              {check.blocks.map((b) => (
-                <li key={b.code + b.message}>{b.message}<Citation block={b} /></li>
-              ))}
-            </ul>
-            {check.safeCents > 0 && check.safeToken ? (
-              <div className="offer">
-                <button className="primary" disabled={busy} onClick={() => approve(check.safeCents, check.safeToken as string, check.version)}>
-                  Approve {usd(check.safeCents)} to {heirLine?.name}
-                </button>
-                <span>This is the safe amount today. The rest waits.</span>
-              </div>
-            ) : (
-              <p>Nothing can safely go to {heirLine?.name} yet. Pay the creditors below first.</p>
-            )}
+          <div className="verdict" role="alert" key={`stop-${check.version}-${check.requestedCents}`}>
+            <div className="verdict-why">
+              <span className="badge stop">Stopped</span>
+              <h3>Stop. This could put the money on you.</h3>
+              <ul className="reasons">
+                {check.blocks.map((b) => (
+                  <li key={b.code + b.message}>{b.message}<Citation block={b} /></li>
+                ))}
+              </ul>
+            </div>
+            <aside className="verdict-do">
+              <p className="verdict-do-title">What you can do</p>
+              {check.safeCents > 0 && check.safeToken ? (
+                <>
+                  <p className="suggestion">Pay {usd(check.safeCents)} to {first(heirLine?.name)} now. The rest waits until it&apos;s safe.</p>
+                  <button className="primary" disabled={busy} onClick={() => approve(check.safeCents, check.safeToken as string, check.version)}>
+                    Approve {usd(check.safeCents)} to {heirLine?.name}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="suggestion">Nothing can safely go to {first(heirLine?.name)} yet. Pay the creditors first.</p>
+                  <a className="secondary" href="#claims-heading">Go to the creditors</a>
+                </>
+              )}
+            </aside>
           </div>
         )}
 
         {check && check.allowed && check.token && (
-          <div className="ok-panel">
+          <div className="notice ok" key={`ok-${check.version}-${check.requestedCents}`}>
             <p>{usd(check.requestedCents)} to {heirLine?.name} is safe today.</p>
             <button className="primary" disabled={busy} onClick={() => approve(check.requestedCents, check.token as string, check.version)}>
               Approve {usd(check.requestedCents)}
@@ -274,10 +323,14 @@ export function EstateApp({ clientId }: { clientId: string }) {
           </div>
         )}
 
-        {notice && <div className={notice.kind === "ok" ? "ok-panel" : "fail-panel"} role="status">
-            {notice.text}
-            {notice.replay && <> <a href="/replay">Watch the replay</a></>}
-          </div>}
+        {notice && (
+          <div className={`notice ${notice.kind}`} role="status" key={notice.text}>
+            <p>
+              {notice.text}
+              {notice.replay && <> <a href="/replay">Watch the replay</a></>}
+            </p>
+          </div>
+        )}
 
         <table className="ledger">
           <thead>
@@ -294,12 +347,12 @@ export function EstateApp({ clientId }: { clientId: string }) {
               const p = paymentFor({ kind: "heir", id: h.heirId });
               const heir = state.facts.heirs.find((x) => x.id === h.heirId);
               return (
-                <tr key={h.heirId}>
+                <tr key={h.heirId} className={h.heirId === payee ? "chosen" : undefined}>
                   <td>{h.name}{heir?.country !== "US" ? <span className="reason">Lives in {heir?.country === "IE" ? "Ireland" : heir?.country}</span> : null}</td>
                   <td className="num">{usd(h.entitledCents)}</td>
                   <td className="num">{usd(h.distributedCents)}</td>
                   <td className="num">{usd(h.safeNowCents)}</td>
-                  <td className="hide-sm"><PaymentState payment={p} />{p?.transactionId && <span className="id"><br />{p.transactionId}</span>}</td>
+                  <td className="hide-sm"><PaymentState payment={p} />{p?.transactionId && <span className="id">{p.transactionId}</span>}</td>
                 </tr>
               );
             })}
@@ -307,7 +360,7 @@ export function EstateApp({ clientId }: { clientId: string }) {
         </table>
       </section>
 
-      <section aria-labelledby="claims-heading">
+      <section id="creditors" aria-labelledby="claims-heading">
         <div className="section-head"><h2 id="claims-heading">Creditors, in the order Florida law sets</h2></div>
         <table className="ledger">
           <thead>
@@ -327,17 +380,17 @@ export function EstateApp({ clientId }: { clientId: string }) {
                   <td>{l.creditor}{l.class === 8 && l.claimId === "funeral" ? <span className="reason">Above the $6,000 funeral cap, so this part ranks last.</span> : null}</td>
                   <td className="num">{usd(l.amountCents)}</td>
                   <td>
-                    {l.status === "paid" && <span className="state paid">Paid</span>}
-                    {l.status === "payable" && (p?.status === "failed" ? <span className="state stop">Failed, still owed</span> : <span className="state waiting">Owed</span>)}
-                    {l.status === "held" && <span className="state held">Reserved, not paid</span>}
-                    {l.status === "barred" && <span className="state stop">Out of time</span>}
+                    {l.status === "paid" && <span className="badge paid">Paid</span>}
+                    {l.status === "payable" && (p?.status === "failed" ? <span className="badge stop">Failed, still owed</span> : <span className="badge owed">Owed</span>)}
+                    {l.status === "held" && <span className="badge held">Reserved, not paid</span>}
+                    {l.status === "barred" && <span className="badge stop">Out of time</span>}
                     {l.reason && <span className="reason">{l.reason.message}</span>}
                     {l.status === "held" && !plan.windowOpen && (
                       <button className="link" disabled={busy} onClick={() => releaseClaim(l.claimId)}>
                         Nothing was filed in court by the deadline: release this reserve
                       </button>
                     )}
-                    {l.status === "paid" && p?.transactionId && <span className="id"><br />{p.transactionId}</span>}
+                    {l.status === "paid" && p?.transactionId && <span className="id">{p.transactionId}</span>}
                     {l.status === "paid" && p && !p.transactionId && <span className="reason">{p.paypalStatus ? `PayPal: ${p.paypalStatus.toLowerCase()}` : "Sent to PayPal"}</span>}
                   </td>
                 </tr>
@@ -352,7 +405,7 @@ export function EstateApp({ clientId }: { clientId: string }) {
         </div>
       </section>
 
-      <section aria-labelledby="timeline-heading">
+      <section id="timeline" aria-labelledby="timeline-heading">
         <div className="section-head"><h2 id="timeline-heading">Who gets paid, and when</h2></div>
         <MoneyTimeline state={state} />
       </section>
@@ -363,11 +416,11 @@ export function EstateApp({ clientId }: { clientId: string }) {
 
       <FaultDrill drills={drills} onChange={setDrills} />
 
-      <section aria-labelledby="record-heading">
+      <section id="record" aria-labelledby="record-heading">
         <div className="section-head"><h2 id="record-heading">The record</h2></div>
         <p className="section-note">Everything that happened, and why. Nothing here can be edited.</p>
         {records.length === 0 ? (
-          <p className="section-note">Nothing has moved yet.</p>
+          <p className="empty">Nothing has moved yet. Try paying Tom his full share.</p>
         ) : (
           <ol className="record">
             {records.map(({ e, line }) => (
@@ -378,13 +431,8 @@ export function EstateApp({ clientId }: { clientId: string }) {
       </section>
 
       <footer className="foot">
-        <p>
-          A hackathon demo using one state&apos;s rules, for use alongside a lawyer. It isn&apos;t legal advice, and the people in it don&apos;t exist.{" "}
-          <button className="link" onClick={reset} disabled={busy}>Start this estate again</button>{" · "}
-          <a href="/accounting">Final account</a>{" · "}
-          <a href="/replay">Replay of a real run</a>
-        </p>
+        <p>A hackathon demo using one state&apos;s rules, for use alongside a lawyer. It isn&apos;t legal advice, and the people in it don&apos;t exist.</p>
       </footer>
-    </main>
+    </Shell>
   );
 }
