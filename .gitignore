@@ -19,3 +19,5 @@ video/raw/
 Thumbs.db
 *.log
 graphify-out/
+tsconfig.tsbuildinfo
+next-env.d.ts
