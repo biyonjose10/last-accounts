@@ -1,9 +1,9 @@
 {
   "model": "gemini-3.5-flash",
-  "recordedAt": "2026-11-05T15:21:33.389Z",
+  "recordedAt": "2026-11-05T16:01:30.845Z",
   "reading": {
     "documentType": "creditor_claim",
-    "summary": "This document is an invoice (Invoice no. 2026-118) dated 1 Sep 2026 from the Law Office of Imelda Quarrington to Dana Calloway, Personal Representative for the Estate of Ruth Calloway. It bills for probate attorney fees, filing costs, publishing costs, and postage totaling $3,850.00.",
+    "summary": "Invoice no. 2026-118 from Law Office of Imelda Quarrington to Dana Calloway, Personal Representative for the Estate of Ruth Calloway, for probate attorney fees and filing costs totaling $2,850.00.",
     "facts": [
       {
         "label": "Invoice Number",
@@ -11,35 +11,35 @@
         "quote": "Invoice no. 2026-118"
       },
       {
-        "label": "Creditor Name",
+        "label": "Invoice Date",
+        "value": "1 Sep 2026",
+        "quote": "Invoice date: 1 Sep 2026"
+      },
+      {
+        "label": "Creditor",
         "value": "Law Office of Imelda Quarrington",
         "quote": "Law Office of Imelda Quarrington"
       },
       {
-        "label": "Estate/Deceased Name",
-        "value": "Estate of Ruth Calloway",
-        "quote": "Estate of Ruth Calloway"
+        "label": "Recipient",
+        "value": "Dana Calloway, Personal Representative, Estate of Ruth Calloway",
+        "quote": "Dana Calloway, Personal Representative\nEstate of Ruth Calloway"
       },
       {
-        "label": "Personal Representative",
-        "value": "Dana Calloway",
-        "quote": "Dana Calloway, Personal Representative"
-      },
-      {
-        "label": "Services Rendered",
-        "value": "Probate attorney and filing costs",
+        "label": "Services Provided",
+        "value": "Probate attorney and filing costs, Estate of Ruth Calloway",
         "quote": "For: Probate attorney and filing costs, Estate of Ruth Calloway"
       },
       {
-        "label": "Total Due",
-        "value": "$3,850.00",
-        "quote": "Total due $3,850.00"
+        "label": "Total Amount Due",
+        "value": "$2,850.00",
+        "quote": "Total due $2,850.00"
       }
     ],
     "claim": {
       "creditor": "Law Office of Imelda Quarrington",
-      "statedAmount": "3850.00",
-      "statedAmountQuote": "$3,850.00",
+      "statedAmount": "2850.00",
+      "statedAmountQuote": "Total due $2,850.00",
       "category": "administration",
       "dateOnDocument": "2026-09-01",
       "namesTheDeceased": true,

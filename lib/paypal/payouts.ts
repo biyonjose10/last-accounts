@@ -32,15 +32,7 @@ export async function payBatch(
     })),
   };
 
-  const attempt = async () => paypal("/v1/payments/payouts", { method: "POST", body, safeToRepeat: true });
-  let res = await attempt();
-
-  // The estate's fake balance ran low: refill from the published test card, then retry the same batch.
-  if (!res.ok && mentions(res.json, "INSUFFICIENT_FUNDS") && !opts.simulateNote) {
-    const total = items.reduce((s, i) => s + i.amountCents, 0);
-    await refillSandboxBalance(Math.min(total + 500_000, 9_000_000));
-    res = await attempt();
-  }
+  const res = await paypal("/v1/payments/payouts", { method: "POST", body, safeToRepeat: true });
 
   if (res.ok) return { kind: "sent", batchId: res.json.batch_header.payout_batch_id, duplicate: false };
 
@@ -56,8 +48,6 @@ export async function payBatch(
     simulated: Boolean(opts.simulateNote),
   };
 }
-
-const mentions = (json: unknown, text: string) => JSON.stringify(json ?? "").includes(text);
 
 export interface BatchStatus {
   batchId: string;
@@ -98,21 +88,3 @@ export async function batchStatus(batchId: string): Promise<BatchStatus> {
 
 export const FINAL_ITEM_STATUSES = new Set(["SUCCESS", "FAILED", "RETURNED", "BLOCKED", "REFUNDED", "REVERSED"]);
 export const MONEY_BACK_STATUSES = new Set(["FAILED", "RETURNED", "BLOCKED", "REFUNDED", "REVERSED"]);
-
-/**
- * Sandbox housekeeping, not part of the product flow. Tops up the fake estate balance using PayPal's
- * published sandbox test card, so repeat visitors can't drain the demo. Fake money only.
- */
-export async function refillSandboxBalance(amountCents: number): Promise<boolean> {
-  const res = await paypal("/v2/checkout/orders", {
-    method: "POST",
-    safeToRepeat: true,
-    headers: { "PayPal-Request-Id": `refill-${Date.now()}` },
-    body: {
-      intent: "CAPTURE",
-      purchase_units: [{ amount: { currency_code: "USD", value: toValue(amountCents) }, description: "Sandbox balance refill" }],
-      payment_source: { card: { number: "4111111111111111", expiry: "2030-12", security_code: "123", name: "Sandbox Refill" } },
-    },
-  });
-  return res.ok && res.json.status === "COMPLETED";
-}

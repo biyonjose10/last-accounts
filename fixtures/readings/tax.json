@@ -1,12 +1,12 @@
 {
   "model": "gemini-3.5-flash",
-  "recordedAt": "2026-11-05T15:21:41.889Z",
+  "recordedAt": "2026-11-05T16:01:39.970Z",
   "reading": {
     "documentType": "creditor_claim",
-    "summary": "Notice of final federal income tax balance due for decedent Ruth Calloway in the amount of $1,900.00, payable to the United States Treasury and addressed to Dana Calloway, Personal Representative.",
+    "summary": "A final income tax balance notice received on September 15, 2026, for decedent Ruth Calloway (date of death March 14, 2026). The notice is addressed to Dana Calloway, Personal Representative, for federal income tax covering the final period ending March 14, 2026. The total balance due to the United States Treasury is $1,400.00.",
     "facts": [
       {
-        "label": "Deceased Name",
+        "label": "Decedent",
         "value": "Ruth Calloway",
         "quote": "Decedent: Ruth Calloway"
       },
@@ -21,7 +21,7 @@
         "quote": "Addressed to: Dana Calloway, Personal Representative"
       },
       {
-        "label": "Tax Type",
+        "label": "Tax Description",
         "value": "Federal income tax, final period ending 14 Mar 2026",
         "quote": "Tax: Federal income tax, final period ending 14 Mar 2026"
       },
@@ -32,14 +32,14 @@
       },
       {
         "label": "Balance Due",
-        "value": "$1,900.00",
-        "quote": "Balance due: $1,900.00"
+        "value": "$1,400.00",
+        "quote": "Balance due: $1,400.00"
       }
     ],
     "claim": {
       "creditor": "United States Treasury",
-      "statedAmount": "1900.00",
-      "statedAmountQuote": "Balance due: $1,900.00",
+      "statedAmount": "1400.00",
+      "statedAmountQuote": "Balance due: $1,400.00",
       "category": "federal",
       "dateOnDocument": "2026-09-15",
       "namesTheDeceased": true,

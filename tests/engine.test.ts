@@ -5,6 +5,8 @@ import type { Claim, EstateFacts } from "@/lib/engine/types";
 import { AFTER_WINDOW_DATE, START_DATE, claims, estate, lateLetter } from "@/fixtures/scenario";
 
 const setAllPaid = (cs: Claim[]) => cs.map((c) => ({ ...c, paidCents: c.amountCents }));
+const CLAIMS_TOTAL = claims.reduce((s, c) => s + c.amountCents, 0);
+const LETTER = lateLetter.amountCents;
 
 describe("733.707 payment classes", () => {
   it("puts each category in the class the statute names", () => {
@@ -94,28 +96,28 @@ describe("733.805 abatement", () => {
   const facts: EstateFacts = estate;
 
   it("pays the general gift before the residue", () => {
-    const e = entitlements(facts, 10_000_000);
-    expect(e.aoife).toBe(1_000_000);
-    expect(e.dana).toBe(4_500_000);
-    expect(e.tom).toBe(4_500_000);
+    const e = entitlements(facts, 2_200_000);
+    expect(e.aoife).toBe(200_000);
+    expect(e.dana).toBe(1_000_000);
+    expect(e.tom).toBe(1_000_000);
   });
 
   it("reduces the residue first, wiping it out before touching the general gift", () => {
-    const e = entitlements(facts, 1_000_000);
-    expect(e.aoife).toBe(1_000_000);
+    const e = entitlements(facts, 200_000);
+    expect(e.aoife).toBe(200_000);
     expect(e.dana).toBe(0);
     expect(e.tom).toBe(0);
   });
 
   it("reduces the general gift once the residue is gone", () => {
-    const e = entitlements(facts, 600_000);
-    expect(e.aoife).toBe(600_000);
+    const e = entitlements(facts, 150_000);
+    expect(e.aoife).toBe(150_000);
     expect(e.dana).toBe(0);
   });
 
   it("never loses a cent when splitting an odd residue", () => {
-    const e = entitlements(facts, 1_000_001 + 1_000_000);
-    expect((e.aoife ?? 0) + (e.dana ?? 0) + (e.tom ?? 0)).toBe(2_000_001);
+    const e = entitlements(facts, 200_000 + 1_000_001);
+    expect((e.aoife ?? 0) + (e.dana ?? 0) + (e.tom ?? 0)).toBe(1_200_001);
   });
 });
 
@@ -123,7 +125,7 @@ describe("the stop moment", () => {
   it("blocks paying Tom his full share while the window is open, and offers a safe amount", () => {
     const paid = { ...estate };
     const allPaid = setAllPaid(claims);
-    const plan = planEstate({ ...paid, cashCents: paid.cashCents - 3_090_000 }, allPaid, START_DATE);
+    const plan = planEstate({ ...paid, cashCents: paid.cashCents - CLAIMS_TOTAL }, allPaid, START_DATE);
     const tom = plan.heirs.find((h) => h.heirId === "tom")!;
     const check = checkHeirPayment(plan, "tom", tom.entitledCents);
     expect(check.allowed).toBe(false);
@@ -144,7 +146,7 @@ describe("the stop moment", () => {
 
   it("refuses more than an heir is due", () => {
     const allPaid = setAllPaid(claims);
-    const plan = planEstate({ ...estate, cashCents: estate.cashCents - 3_090_000 }, allPaid, AFTER_WINDOW_DATE);
+    const plan = planEstate({ ...estate, cashCents: estate.cashCents - CLAIMS_TOTAL }, allPaid, AFTER_WINDOW_DATE);
     const aoife = plan.heirs.find((h) => h.heirId === "aoife")!;
     const check = checkHeirPayment(plan, "aoife", aoife.entitledCents + 1);
     expect(check.blocks.map((b) => b.code)).toContain("OVER_ENTITLEMENT");
@@ -168,7 +170,7 @@ describe("the stop moment", () => {
 describe("a suspected fake debt", () => {
   it("is reserved in full and can never be paid", () => {
     const plan = planEstate(estate, [...claims, lateLetter], START_DATE);
-    expect(plan.disputedReserveCents).toBe(940_000);
+    expect(plan.disputedReserveCents).toBe(LETTER);
     const check = checkClaimPayment(plan, "northgate");
     expect(check.allowed).toBe(false);
     expect(check.safeCents).toBe(0);
@@ -177,22 +179,22 @@ describe("a suspected fake debt", () => {
 
   it("lowers what heirs can safely receive", () => {
     const allPaid = setAllPaid(claims);
-    const facts = { ...estate, cashCents: estate.cashCents - 3_090_000 };
+    const facts = { ...estate, cashCents: estate.cashCents - CLAIMS_TOTAL };
     const before = planEstate(facts, allPaid, START_DATE);
     const after = planEstate(facts, [...allPaid, lateLetter], START_DATE);
-    expect(after.distributableNowCents).toBe(before.distributableNowCents - 940_000);
+    expect(after.distributableNowCents).toBe(before.distributableNowCents - LETTER);
   });
 
   it("stays reserved after the window closes, until it is resolved", () => {
     const plan = planEstate(estate, [...claims, lateLetter], AFTER_WINDOW_DATE);
-    expect(plan.disputedReserveCents).toBe(940_000);
+    expect(plan.disputedReserveCents).toBe(LETTER);
   });
 });
 
 describe("whole-estate arithmetic", () => {
   it("shares out everything once the window closes and all claims are paid", () => {
     const allPaid = setAllPaid(claims);
-    const facts = { ...estate, cashCents: estate.cashCents - 3_090_000, otherAssets: [] };
+    const facts = { ...estate, cashCents: estate.cashCents - CLAIMS_TOTAL, otherAssets: [] };
     const plan = planEstate(facts, allPaid, AFTER_WINDOW_DATE);
     expect(plan.contingencyReserveCents).toBe(0);
     const safe = plan.heirs.reduce((s, h) => s + h.safeNowCents, 0);
@@ -209,20 +211,58 @@ describe("whole-estate arithmetic", () => {
     const facts: EstateFacts = {
       ...estate,
       otherAssets: [],
-      cashCents: estate.cashCents - 3_090_000 - 5_000_000,
-      distributedCents: { tom: 5_000_000 },
+      cashCents: estate.cashCents - CLAIMS_TOTAL - 500_000,
+      distributedCents: { tom: 500_000 },
     };
     const plan = planEstate(facts, allPaid, AFTER_WINDOW_DATE);
     const tom = plan.heirs.find((h) => h.heirId === "tom")!;
     const dana = plan.heirs.find((h) => h.heirId === "dana")!;
     expect(tom.entitledCents).toBe(dana.entitledCents);
-    expect(tom.safeNowCents).toBe(dana.safeNowCents - 5_000_000);
+    expect(tom.safeNowCents).toBe(dana.safeNowCents - 500_000);
+    expect(plan.heirs.reduce((s, h) => s + h.safeNowCents, 0)).toBe(facts.cashCents);
+  });
+
+  it("can't be drained by paying the safe amount again and again while the window is open", () => {
+    const allPaid = setAllPaid(claims);
+    let facts: EstateFacts = { ...estate, cashCents: estate.cashCents - CLAIMS_TOTAL, distributedCents: {} };
+    const first = planEstate(facts, allPaid, START_DATE);
+    const margin = first.contingencyReserveCents;
+    for (let round = 0; round < 6; round++) {
+      const plan = planEstate(facts, allPaid, START_DATE);
+      const paid: Record<string, number> = { ...facts.distributedCents };
+      let cash = facts.cashCents;
+      for (const h of plan.heirs) {
+        paid[h.heirId] = (paid[h.heirId] ?? 0) + h.safeNowCents;
+        cash -= h.safeNowCents;
+      }
+      facts = { ...facts, cashCents: cash, distributedCents: paid };
+    }
+    expect(facts.cashCents).toBeGreaterThanOrEqual(margin);
+    expect(planEstate(facts, allPaid, START_DATE).distributableNowCents).toBe(0);
+    expect(planEstate(facts, allPaid, START_DATE).contingencyReserveCents).toBe(margin);
+  });
+
+  it("doesn't let one heir taking their share first reduce another's", () => {
+    const allPaid = setAllPaid(claims);
+    const base: EstateFacts = { ...estate, cashCents: estate.cashCents - CLAIMS_TOTAL };
+    const before = planEstate(base, allPaid, START_DATE);
+    const tomSafe = before.heirs.find((h) => h.heirId === "tom")!.safeNowCents;
+    const after = planEstate({ ...base, cashCents: base.cashCents - tomSafe, distributedCents: { tom: tomSafe } }, allPaid, START_DATE);
+    expect(after.heirs.find((h) => h.heirId === "tom")!.safeNowCents).toBe(0);
+    const danaBefore = before.heirs.find((h) => h.heirId === "dana")!.safeNowCents;
+    expect(after.heirs.find((h) => h.heirId === "dana")!.safeNowCents).toBe(danaBefore);
+  });
+
+  it("pays the general gift in full before the residue shares what's safe", () => {
+    const allPaid = setAllPaid(claims);
+    const plan = planEstate({ ...estate, cashCents: estate.cashCents - CLAIMS_TOTAL }, allPaid, START_DATE);
+    expect(plan.heirs.find((h) => h.heirId === "aoife")!.safeNowCents).toBe(200_000);
   });
 
   it("selling the car turns it into cash and raises what's safe now", () => {
     const allPaid = setAllPaid(claims);
-    const before = { ...estate, cashCents: estate.cashCents - 3_090_000 };
-    const netFromSale = 1_440_000 - 37_345;
+    const before = { ...estate, cashCents: estate.cashCents - CLAIMS_TOTAL };
+    const netFromSale = 640_000 - 17_000;
     const after = { ...before, cashCents: before.cashCents + netFromSale, otherAssets: [] };
     const a = planEstate(before, allPaid, START_DATE);
     const b = planEstate(after, allPaid, START_DATE);
@@ -230,7 +270,7 @@ describe("whole-estate arithmetic", () => {
   });
 
   it("flags an insolvent estate and pays heirs nothing", () => {
-    const facts = { ...estate, cashCents: 1_000_000, otherAssets: [] };
+    const facts = { ...estate, cashCents: 500_000, otherAssets: [] };
     const plan = planEstate(facts, claims, AFTER_WINDOW_DATE);
     expect(plan.insolvent).toBe(true);
     expect(plan.distributableNowCents).toBe(0);

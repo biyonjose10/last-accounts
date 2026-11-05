@@ -1,24 +1,24 @@
 {
   "model": "gemini-3.5-flash",
-  "recordedAt": "2026-11-05T15:21:23.847Z",
+  "recordedAt": "2026-11-05T16:01:22.067Z",
   "reading": {
     "documentType": "bank_statement",
-    "summary": "Bank statement from Gulfline Community Bank for the Estate Checking account ending in 7719 for the Estate of Ruth Calloway, Dana Calloway, Personal Representative, covering the period from 28 Aug 2026 to 30 Sep 2026. The ending balance is $197,600.00.",
+    "summary": "An account statement from Gulfline Community Bank for the Estate Checking account ending in 7719 for the Estate of Ruth Calloway, Dana Calloway Personal Representative. For the period 28 Aug 2026 to 30 Sep 2026, the ending balance is $46,400.00 following transfers from the deceased's checking and savings accounts plus interest.",
     "facts": [
       {
-        "label": "Account Owner",
-        "value": "Estate of Ruth Calloway",
-        "quote": "Estate of Ruth Calloway"
+        "label": "Financial Institution",
+        "value": "Gulfline Community Bank",
+        "quote": "Gulfline Community Bank"
       },
       {
-        "label": "Personal Representative",
-        "value": "Dana Calloway",
-        "quote": "Dana Calloway, Personal Representative"
+        "label": "Account Holder",
+        "value": "Estate of Ruth Calloway, Dana Calloway, Personal Representative",
+        "quote": "Estate of Ruth Calloway\nDana Calloway, Personal Representative"
       },
       {
-        "label": "Account Type and Number",
-        "value": "Estate Checking ending in 7719",
-        "quote": "Account ending 7719\nEstate Checking"
+        "label": "Account Number Ending",
+        "value": "7719",
+        "quote": "Account ending 7719"
       },
       {
         "label": "Statement Period",
@@ -27,13 +27,13 @@
       },
       {
         "label": "Ending Balance",
-        "value": "$197,600.00",
-        "quote": "Ending balance, 30 Sep 2026 $197,600.00"
+        "value": "$46,400.00",
+        "quote": "Ending balance, 30 Sep 2026 $46,400.00"
       },
       {
-        "label": "Bank Name",
-        "value": "Gulfline Community Bank",
-        "quote": "Gulfline Community Bank"
+        "label": "Deposits and Interest",
+        "value": "$46,400.00",
+        "quote": "Deposits and interest $46,400.00"
       }
     ],
     "claim": null,

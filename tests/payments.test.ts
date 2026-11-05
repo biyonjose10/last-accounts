@@ -39,7 +39,7 @@ async function payAllClaims() {
 
 describe("paying heirs", () => {
   it("blocks full share with an unpaid federal claim, calls nobody, and records the attempt", async () => {
-    const check = await checkPayment(WS, { kind: "heir", id: "tom" }, 8_500_000, s);
+    const check = await checkPayment(WS, { kind: "heir", id: "tom" }, 1_000_000, s);
     expect(check.allowed).toBe(false);
     expect(check.token).toBeNull();
     expect(payBatch).not.toHaveBeenCalled();
@@ -53,8 +53,8 @@ describe("paying heirs", () => {
   });
 
   it("re-checks at payment time, so a token can't beat the engine", async () => {
-    const token = approvalToken(WS, { kind: "heir", id: "tom" }, 8_500_000, 0);
-    const r = await pay(WS, { kind: "heir", id: "tom" }, 8_500_000, token, 0, { store: s });
+    const token = approvalToken(WS, { kind: "heir", id: "tom" }, 1_000_000, 0);
+    const r = await pay(WS, { kind: "heir", id: "tom" }, 1_000_000, token, 0, { store: s });
     expect(r).toMatchObject({ ok: false, reason: "blocked" });
     expect(payBatch).not.toHaveBeenCalled();
   });
@@ -63,7 +63,7 @@ describe("paying heirs", () => {
     await payAllClaims();
     payBatch.mockClear();
     const tom = { kind: "heir", id: "tom" } as const;
-    const first = await checkPayment(WS, tom, 8_555_000, s);
+    const first = await checkPayment(WS, tom, 1_470_000, s);
     expect(first.allowed).toBe(false);
     expect(first.safeCents).toBeGreaterThan(0);
     expect(first.blocks.map((b) => b.code)).toContain("CLAIM_WINDOW_OPEN");
@@ -156,7 +156,7 @@ describe("paying claims", () => {
 
   it("never pays a suspected fake, even in a batch", async () => {
     await s.append(WS, "claim_added", {
-      claim: { id: "fake", creditor: "Northgate", amountCents: 940_000, category: "other", triage: "suspected_fake", receivedOn: "2026-10-20", paidCents: 0 },
+      claim: { id: "fake", creditor: "Northgate", amountCents: 440_000, category: "other", triage: "suspected_fake", receivedOn: "2026-10-20", paidCents: 0 },
     });
     const r = await payClaimsInOrder(WS, [...ALL_CLAIMS, "fake"], { store: s });
     expect(r).toMatchObject({ ok: false, reason: "blocked", claimId: "fake" });

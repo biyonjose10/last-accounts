@@ -182,25 +182,6 @@ switch (command) {
     show("payout-repeat-2", await call("/v1/payments/payouts", { method: "POST", body: payoutBody("1.00", id) }));
     break;
   }
-  case "topup": {
-    // Refills the sandbox estate with PayPal's published sandbox test card. Fake money only.
-    const result = await call("/v2/checkout/orders", {
-      method: "POST",
-      headers: { "PayPal-Request-Id": randomUUID() },
-      body: {
-        intent: "CAPTURE",
-        purchase_units: [{ amount: { currency_code: "USD", value: Number(arg ?? "100").toFixed(2) }, description: "Sandbox balance refill" }],
-        payment_source: {
-          card: { number: "4111111111111111", expiry: "2030-12", security_code: "123", name: "Sandbox Refill" },
-        },
-      },
-    });
-    record("topup", { status: result.status, id: result.json.id, state: result.json.status, name: result.json.name, details: result.json.details });
-    console.log("topup HTTP", result.status, result.json.id ?? "", result.json.status ?? result.json.name ?? "", JSON.stringify(result.json.details ?? ""));
-    const caps = (result.json.purchase_units ?? []).flatMap((u) => u.payments?.captures ?? []);
-    console.log(caps.map((c) => [c.id, c.status, c.amount.value, c.seller_receivable_breakdown?.paypal_fee?.value]));
-    break;
-  }
   case "get-order":
     show("get-order", await call(`/v2/checkout/orders/${arg}`));
     break;

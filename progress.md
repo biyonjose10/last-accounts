@@ -29,7 +29,7 @@ Everything below was run from sir's account against the sandbox.
 **Works**
 - Dashboard access from India. Default sandbox accounts are IN, so we made US ones: Estate (business), Tom (personal). App name is "Estate Ledger" because PayPal bans "account" in app names.
 - Order, buyer approval, capture. Simulated decline with `PayPal-Mock-Response`. Payouts, duplicate rejection.
-- Card-funded orders complete with no buyer approval. `sandbox-proof.mjs topup <amount>` refills the Estate. Test card only, fake money.
+- Card-funded orders complete with no buyer approval. **They do NOT add spendable balance** (see below).
 
 **Traps found**
 - Balance form refuses $100,000 or more.
@@ -40,5 +40,9 @@ Everything below was run from sir's account against the sandbox.
 - Sandbox login form ignores scripted values. Real keystrokes work.
 
 **Still to do in Phase 0:** recheck Balances and Transaction Search; Dana and Aoife accounts before the final-batch phase.
+
+**Correction, 5 Nov evening:** the earlier "refill works" note was wrong. The dashboard's balance matched the sum with every capture left out: $23,070.75 on the Estate. Neither the test-card orders nor Tom's $14.40 capture became spendable, at least not within hours. Payouts then return INSUFFICIENT_FUNDS.
+**How to refill:** Testing Tools > Sandbox Accounts > Estate > pencil beside PayPal balance. Must be under $100,000.
+**Design result:** the estate was cut from about $212,000 to about $52,800 so a full run fits in one fill, with two full runs per fill. Car-sale cash counts in the ledger, but isn't spendable in the sandbox, which is fine because the balance stays well above it.
 
 **Sir still owes:** Tom's and Estate's passwords stay in his own note; they go in the judges' instructions only for Tom.

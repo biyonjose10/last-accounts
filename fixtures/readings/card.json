@@ -1,9 +1,9 @@
 {
   "model": "gemini-3.5-flash",
-  "recordedAt": "2026-11-05T15:21:50.402Z",
+  "recordedAt": "2026-11-05T16:01:48.819Z",
   "reading": {
     "documentType": "creditor_claim",
-    "summary": "A creditor claim from Harbor Credit Card's Estate Claims Unit against the Estate of Ruth Calloway for an outstanding credit card balance totaling $4,310.00. The claim was prepared on 18 Sep 2026 and includes a balance at date of death of $4,112.60 plus interest and fees since date of death of $197.40.",
+    "summary": "A creditor claim from Harbor Credit Card for the Estate of Ruth Calloway seeking payment of $2,310.00 for a credit card account ending in 2048.",
     "facts": [
       {
         "label": "Deceased Cardholder",
@@ -16,14 +16,9 @@
         "quote": "Account ending 2048"
       },
       {
-        "label": "Date of Death",
-        "value": "14 Mar 2026",
-        "quote": "Balance at date of death, 14 Mar 2026"
-      },
-      {
         "label": "Balance at Date of Death",
-        "value": "$4,112.60",
-        "quote": "Balance at date of death, 14 Mar 2026 $4,112.60"
+        "value": "$2,112.60",
+        "quote": "Balance at date of death, 14 Mar 2026 $2,112.60"
       },
       {
         "label": "Interest and Fees",
@@ -32,14 +27,19 @@
       },
       {
         "label": "Total Balance Claimed",
-        "value": "$4,310.00",
-        "quote": "Total balance claimed $4,310.00"
+        "value": "$2,310.00",
+        "quote": "Total balance claimed $2,310.00"
+      },
+      {
+        "label": "Personal Representative",
+        "value": "Dana Calloway",
+        "quote": "C/O DANA CALLOWAY, PERSONAL REPRESENTATIVE"
       }
     ],
     "claim": {
       "creditor": "Harbor Credit Card",
-      "statedAmount": "4310.00",
-      "statedAmountQuote": "Total balance claimed $4,310.00",
+      "statedAmount": "2310.00",
+      "statedAmountQuote": "Total balance claimed $2,310.00",
       "category": "other",
       "dateOnDocument": "2026-09-18",
       "namesTheDeceased": true,

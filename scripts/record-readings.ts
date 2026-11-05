@@ -7,7 +7,7 @@ import path from "node:path";
 import { MODEL } from "../lib/ai/gemini";
 import { guardAction, nextAction, readDocument, triageClaim } from "../lib/ai/reader";
 import type { Claim } from "../lib/engine/types";
-import { claims as seedClaims } from "../fixtures/scenario";
+import { START_DATE, claims as seedClaims } from "../fixtures/scenario";
 
 const INCOMING = new Set(["filing", "northgate"]);
 const root = path.join(process.cwd(), "fixtures");
@@ -36,7 +36,7 @@ for (const doc of docs) {
       amountVerified: checked.amountVerified,
       suspiciousText: checked.suspiciousText,
       facts: checked.facts.map((f) => ({ label: f.label, value: f.value })),
-      today: "2026-10-21",
+      today: START_DATE,
       knownCreditors: seedClaims.map((c) => c.creditor),
     });
     const claim: Claim = {

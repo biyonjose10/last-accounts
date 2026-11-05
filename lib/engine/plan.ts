@@ -21,6 +21,9 @@ import type {
   PaymentCheck,
 } from "./types";
 
+const longDate = (iso: IsoDate) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+
 const usd = (cents: Cents) =>
   `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -98,12 +101,16 @@ export function planEstate(facts: EstateFacts, claims: Claim[], asOf: IsoDate): 
   const owed = lines.filter((l) => l.status === "payable").reduce((s, l) => s + l.owedCents, 0);
   const gross = facts.cashCents + otherValue;
 
-  const contingency = windowOpen ? Math.floor((gross * CONTINGENCY_BPS) / 10_000) : 0;
+  // The margin is set on everything the estate started with, so paying people out can't shrink it.
+  const distributedSoFar = Object.values(facts.distributedCents).reduce((s, v) => s + v, 0);
+  const claimsPaid = claims.reduce((s, c) => s + c.paidCents, 0);
+  const startingValue = gross + distributedSoFar + claimsPaid;
+  const contingency = windowOpen ? Math.floor((startingValue * CONTINGENCY_BPS) / 10_000) : 0;
   const distributableNow = Math.max(0, facts.cashCents - owed - disputedReserve - contingency);
 
   // Heirs' entitlements come out of the whole estate, after everything owed and reserved.
   // Anything already distributed is still part of what they were entitled to.
-  const alreadyOut = Object.values(facts.distributedCents).reduce((s, v) => s + v, 0);
+  const alreadyOut = distributedSoFar;
   const netForHeirs = Math.max(0, gross + alreadyOut - owed - disputedReserve);
   const entitlement = entitlements(facts, netForHeirs);
 
@@ -120,20 +127,34 @@ export function planEstate(facts: EstateFacts, claims: Claim[], asOf: IsoDate): 
     };
   });
 
-  // Share what's safe in proportion to what each heir is still owed.
-  const stillDue = heirs.reduce((s, h) => s + h.heldBackCents, 0);
-  let handedOut = 0;
-  heirs.forEach((h, i) => {
-    const portion =
-      stillDue === 0
+  // Each heir's safe total counts what they've already had, so taking a share first can't eat into anyone else's.
+  // General gifts come out first (733.805 reduces the residue before them). The residue shares the rest.
+  const generalIds = new Set(facts.devises.flatMap((d) => (d.kind === "general" ? [d.heirId] : [])));
+  let safeLeft = distributableNow + alreadyOut;
+  const fairShare = new Map<string, Cents>();
+  for (const h of heirs.filter((x) => generalIds.has(x.heirId))) {
+    const fair = Math.min(h.entitledCents, safeLeft);
+    fairShare.set(h.heirId, fair);
+    safeLeft -= fair;
+  }
+  const residuaryHeirs = heirs.filter((x) => !generalIds.has(x.heirId));
+  const residuaryEntitled = residuaryHeirs.reduce((sum, h) => sum + h.entitledCents, 0);
+  const safeForResidue = safeLeft;
+  residuaryHeirs.forEach((h, i) => {
+    const fair =
+      residuaryEntitled === 0
         ? 0
-        : i === heirs.length - 1
-          ? distributableNow - handedOut
-          : Math.floor((distributableNow * h.heldBackCents) / stillDue);
-    h.safeNowCents = Math.max(0, Math.min(portion, h.heldBackCents));
-    handedOut += portion;
-    h.heldBackCents -= h.safeNowCents;
+        : i === residuaryHeirs.length - 1
+          ? safeLeft
+          : Math.floor((safeForResidue * h.entitledCents) / residuaryEntitled);
+    fairShare.set(h.heirId, fair);
+    safeLeft -= fair;
   });
+  for (const h of heirs) {
+    const room = Math.max(0, h.entitledCents - h.distributedCents);
+    h.safeNowCents = Math.max(0, Math.min((fairShare.get(h.heirId) ?? 0) - h.distributedCents, room));
+    h.heldBackCents = room - h.safeNowCents;
+  }
 
   return {
     asOf,
@@ -213,7 +234,7 @@ export function checkHeirPayment(plan: EstatePlan, heirId: string, requestedCent
     if (plan.windowOpen) {
       blocks.push({
         code: "CLAIM_WINDOW_OPEN",
-        message: `Creditors can still file claims until ${plan.windowClosesOn}. If you pay this now and the money runs short, you could be held liable for the loss. ${usd(safe)} is safe today.`,
+        message: `Creditors can still file claims until ${longDate(plan.windowClosesOn)}. If you pay this now and the money runs short, you could be held liable for the loss. ${usd(safe)} is safe today.`,
         citation: CITE.fiduciaryLiability,
       });
     } else {

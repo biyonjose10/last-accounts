@@ -1,45 +1,45 @@
 {
   "model": "gemini-3.5-flash",
-  "recordedAt": "2026-11-05T15:21:46.143Z",
+  "recordedAt": "2026-11-05T16:01:44.981Z",
   "reading": {
     "documentType": "creditor_claim",
-    "summary": "A Statement of Claim Against Estate issued by St. Brendan Hospital for patient Ruth Calloway (deceased). The total claim amount is $12,600.00 covering inpatient care, palliative care, medication, supplies, and physician services during the last 60 days of life, from January 15, 2026 to March 14, 2026.",
+    "summary": "This document is a Statement of claim against estate issued by St. Brendan Hospital for medical care provided to Ruth Calloway in the last 60 days of life. The total amount claimed is $6,600.00 for inpatient care, palliative care, medications, and attending physician services.",
     "facts": [
       {
-        "label": "Patient Name",
-        "value": "Ruth Calloway, deceased",
-        "quote": "Ruth Calloway, deceased"
+        "label": "Creditor Name",
+        "value": "St. Brendan Hospital",
+        "quote": "St. Brendan Hospital"
       },
       {
-        "label": "Date of Death",
-        "value": "14 Mar 2026",
-        "quote": "14 Mar 2026"
+        "label": "Deceased Patient",
+        "value": "Ruth Calloway, deceased",
+        "quote": "Patient: Ruth Calloway, deceased"
+      },
+      {
+        "label": "Total Claim Amount",
+        "value": "$6,600.00",
+        "quote": "Total claim $6,600.00"
       },
       {
         "label": "Hospital Account Number",
         "value": "SB-2026-30771",
-        "quote": "SB-2026-30771"
+        "quote": "Hospital account: SB-2026-30771"
       },
       {
         "label": "Dates of Care",
         "value": "15 Jan 2026 to 14 Mar 2026",
-        "quote": "15 Jan 2026 to 14 Mar 2026"
+        "quote": "Dates of care: 15 Jan 2026 to 14 Mar 2026"
       },
       {
         "label": "Personal Representative",
-        "value": "Dana Calloway",
-        "quote": "Dana Calloway, Personal Representative"
-      },
-      {
-        "label": "Total Claim Amount",
-        "value": "$12,600.00",
-        "quote": "$12,600.00"
+        "value": "Dana Calloway, Personal Representative",
+        "quote": "Addressed to: Dana Calloway, Personal Representative"
       }
     ],
     "claim": {
       "creditor": "St. Brendan Hospital",
-      "statedAmount": "12600.00",
-      "statedAmountQuote": "$12,600.00",
+      "statedAmount": "6600.00",
+      "statedAmountQuote": "$6,600.00",
       "category": "last_illness",
       "dateOnDocument": "2026-09-18",
       "namesTheDeceased": true,

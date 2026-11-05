@@ -1,28 +1,28 @@
 {
   "model": "gemini-3.5-flash",
-  "recordedAt": "2026-11-05T15:21:19.542Z",
+  "recordedAt": "2026-11-05T16:01:18.147Z",
   "reading": {
     "documentType": "will",
-    "summary": "Last Will and Testament of Ruth Calloway, declaring residence in Tampa, Florida. She nominates her daughter Dana Calloway as Personal Representative without bond, bequeaths $10,000 to her niece Aoife Calloway, and leaves the residue of her estate equally to her children Dana Calloway and Tom Calloway. Signed on June 12, 2019.",
+    "summary": "This document is the Last Will and Testament of Ruth Calloway, a resident of Tampa, Florida, signed on June 12, 2019. It names her daughter, Dana Calloway, as Personal Representative. It leaves a pecuniary gift of $2,000.00 to her niece, Aoife Calloway, and devises the residue of the estate equally to her children, Dana Calloway and Tom Calloway.",
     "facts": [
       {
-        "label": "Testator",
-        "value": "Ruth Calloway",
+        "label": "Testator Name and Residence",
+        "value": "Ruth Calloway, resident of Tampa, Florida",
         "quote": "I, Ruth Calloway, a resident of Tampa, Florida, being of sound mind, declare this to be my Last Will and Testament"
       },
       {
         "label": "Personal Representative",
-        "value": "Dana Calloway",
+        "value": "Dana Calloway (daughter)",
         "quote": "I name my daughter, Dana Calloway, as Personal Representative of my estate, to serve without bond."
       },
       {
         "label": "Monetary Bequest",
-        "value": "$10,000 to Aoife Calloway",
-        "quote": "I give the sum of Ten Thousand Dollars ($10,000.00) to my niece, Aoife Calloway, of Cork, Ireland."
+        "value": "$2,000.00 to niece Aoife Calloway of Cork, Ireland",
+        "quote": "I give the sum of Two Thousand Dollars ($2,000.00) to my niece, Aoife Calloway, of Cork, Ireland."
       },
       {
         "label": "Residuary Beneficiaries",
-        "value": "Dana Calloway and Tom Calloway",
+        "value": "Dana Calloway and Tom Calloway (daughter and son), in equal shares",
         "quote": "I give all the rest, residue and remainder of my estate, in equal shares, to my daughter, Dana Calloway, and my son, Tom Calloway."
       },
       {
@@ -32,8 +32,8 @@
       },
       {
         "label": "Witnesses",
-        "value": "Harlan Pennick and June Abernethy",
-        "quote": "Harlan Pennick\nWitness, Tampa, Florida\n\nJune Abernethy\nWitness, Tampa, Florida"
+        "value": "Harlan Pennick and June Abernethy, both of Tampa, Florida",
+        "quote": "Harlan Pennick Witness, Tampa, Florida June Abernethy Witness, Tampa, Florida"
       }
     ],
     "claim": null,
