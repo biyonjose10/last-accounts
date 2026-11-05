@@ -220,7 +220,8 @@
       "id": "P5-3",
       "phase": 5,
       "name": "Per-visitor limit blocks when exceeded",
-      "passes": false
+      "passes": true,
+      "evidence": "Hosted: sixth fresh estate refused with 429; tests/limits.test.ts for money and read limits"
     },
     {
       "id": "P5-4",
@@ -264,7 +265,8 @@
       "id": "P6-5",
       "phase": 6,
       "name": "APIMatic plugin use is real and documented",
-      "passes": false
+      "passes": true,
+      "evidence": "Plugin installed 5 Nov, used to audit lib/paypal; findings fixed in commit e829735. Described in README and docs/devpost.md as an audit, not as used from the start."
     },
     {
       "id": "P7-1",

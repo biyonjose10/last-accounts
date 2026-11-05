@@ -194,9 +194,11 @@ async function handleIncoming(
     action = guardAction(await nextAction(claim, triage), claim, today);
   } catch (err) {
     if (!(err instanceof AiUnavailable)) throw err;
+    // Without a live reading the agent doesn't act alone. A saved judgement can reserve money, never spend it.
+    const savedStep = !aiOff && saved?.action ? guardAction(saved.action, claim, today) : null;
     action =
-      !aiOff && saved?.action
-        ? guardAction(saved.action, claim, today)
+      savedStep && savedStep.action !== "pay_administration_cost"
+        ? savedStep
         : { action: "ask_dana", reason: "The AI is unavailable, so this waits for Dana. No money moves." };
   }
 
