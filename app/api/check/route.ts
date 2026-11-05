@@ -12,5 +12,7 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Check the amount and payee." }, { status: 400 });
   const workspace = await workspaceId();
-  return NextResponse.json(await checkPayment(workspace, parsed.data.target, parsed.data.amountCents));
+  const result = await checkPayment(workspace, parsed.data.target, parsed.data.amountCents);
+  if (!result) return NextResponse.json({ error: "That payee isn't part of this estate." }, { status: 404 });
+  return NextResponse.json(result);
 }

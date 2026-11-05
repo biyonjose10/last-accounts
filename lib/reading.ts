@@ -17,6 +17,7 @@ import { ClerkAction, Reading, Triage } from "@/lib/ai/schemas";
 import type { Claim, ClaimCategory } from "@/lib/engine/types";
 import { buildState } from "@/lib/ledger/state";
 import { store, type Store } from "@/lib/ledger/store";
+import { VISITOR_READS_PER_DAY } from "@/lib/limits";
 import { approvalToken, pay } from "@/lib/payments";
 
 export interface DocInfo {
@@ -64,6 +65,8 @@ export type ReadVia = "live" | "saved" | "none";
 export interface ReadOptions {
   /** Fault drill: treat the AI as down. */
   aiOff?: boolean;
+  /** Hashed visitor, so clearing cookies doesn't reset the limit. */
+  visitor?: string;
   store?: Store;
 }
 
@@ -74,13 +77,23 @@ export async function processDocument(workspace: string, docId: string, opts: Re
 
   const events = await s.list(workspace);
   const done = events.find((e) => e.type === "document_read" && e.data.docId === docId);
-  if (done && !opts.aiOff) return { ok: true as const, duplicate: true, event: done };
+  if (done && !opts.aiOff) {
+    // If an earlier attempt stopped after reading but before logging the claim, finish that step.
+    const claimLogged = events.some((e) => e.type === "claim_added" && e.data.claim?.id === docId);
+    if (INCOMING.has(docId) && !claimLogged) {
+      const saved = await savedReading(docId);
+      const checked = saved ? checkReading(saved.reading, doc.text) : null;
+      await handleIncoming(s, workspace, doc, checked, saved, "saved", false);
+    }
+    return { ok: true as const, duplicate: true, event: done };
+  }
 
   // Limits are checked first, and a saved reading from a real run takes over when they're reached.
   const day = new Date().toISOString().slice(0, 10);
   const mayGoLive =
     !opts.aiOff &&
     (await s.bump(`reads:${workspace}`, VISITOR_LIVE_READS)) &&
+    (await s.bump(`reads:${opts.visitor ?? "unknown"}:${day}`, VISITOR_READS_PER_DAY)) &&
     (await s.bump(`reads:${day}`, DAILY_LIVE_READS));
 
   let checked: CheckedReading | null = null;

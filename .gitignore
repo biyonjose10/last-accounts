@@ -21,3 +21,6 @@ Thumbs.db
 graphify-out/
 tsconfig.tsbuildinfo
 next-env.d.ts
+
+.vercel
+.env*

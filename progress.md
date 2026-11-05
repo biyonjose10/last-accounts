@@ -53,3 +53,10 @@ Everything below was run from sir's account against the sandbox.
 - PayPal webhook registered at /api/webhook; ID in Vercel and .env.
 - PayPal dashboard sessions expire quickly. Refill the Estate with the pencil on its sandbox account page; it must be under $100,000.
 - Still to do: sir's car test as Tom, record fixtures/replay/run.json from a real run, final account on real data, webhook seen arriving.
+
+### 2026-11-05 late: full hosted run passed
+- Sir bought the car as Tom on the live site: cancel and capture both real. Webhooks verified. Final account matched PayPal line by line.
+- Found by that run: a payout to Ireland cost $20.00, not $0.25, which left the estate at -$19.75. Fee reserve now sets aside $20 for a payout abroad.
+- Red team found two real gaps, both fixed: limits could be burned by refused requests (limits now count only after every check passes, and per visitor), and two different payments at once could overpay (an approval is now stale if money moved since it was issued).
+- Replay saved at fixtures/replay/run.json via scripts/export-replay.ts. Re-export after the final filmed run.
+- Still to do: capture-failure drill on hosted site (needs sir as Tom), exceed limits live, fresh browser check, README, APIMatic, video, Devpost.

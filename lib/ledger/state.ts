@@ -6,8 +6,12 @@ import type { Claim, EstateFacts, EstatePlan } from "@/lib/engine/types";
 import { START_DATE, claims as seedClaims, estate as seedEstate } from "@/fixtures/scenario";
 import type { LedgerEvent } from "./store";
 
-/** Observed in the sandbox: a flat $0.25 per payout. Held back so the last payment can't overdraw. */
+/**
+ * Observed in the sandbox on 5 Nov 2026: $0.25 per payout to a US account, and $20.00 on a $2,000 payout to Ireland.
+ * Held back in full so the last payments can't overdraw the estate.
+ */
 export const PAYOUT_FEE_CENTS = 25;
+export const CROSS_BORDER_FEE_RESERVE_CENTS = 2_000;
 
 export type Target = { kind: "heir"; id: string } | { kind: "claim"; id: string };
 
@@ -62,6 +66,7 @@ export function buildState(events: LedgerEvent[]): EstateState {
   const payments = new Map<string, PaymentRecord>();
   const orders = new Map<string, OrderRecord>();
   let carSold = false;
+  const finalPaid = new Set<string>();
 
   const applyPaid = (p: PaymentRecord, sign: 1 | -1) => {
     cash -= sign * p.amountCents;
@@ -89,6 +94,7 @@ export function buildState(events: LedgerEvent[]): EstateState {
       case "payment_requested": {
         const p: PaymentRecord = { ...e.data, status: "requested", feeCents: 0 };
         payments.set(p.ledgerId, p);
+        if (simulatedDate && p.target.kind === "heir") finalPaid.add(p.target.id);
         applyPaid(p, 1); // Counted as gone from the moment it's approved.
         break;
       }
@@ -159,10 +165,20 @@ export function buildState(events: LedgerEvent[]): EstateState {
     }
   }
 
+  /** An heir who's had a payment after the window closed needs no more fee set aside for them. */
+  const payoutPaidOut = (heirId: string) => finalPaid.has(heirId);
+
   // Once the window closes the last payments can empty the estate, so their transfer fees are set aside.
   // Before that, the prudence margin already covers them.
   const windowClosed = asOf > windowCloses(seedEstate.noticePublishedOn);
-  const feeReserve = windowClosed ? Math.min(cash, seedEstate.heirs.length * PAYOUT_FEE_CENTS) : 0;
+  const feeReserve = windowClosed
+    ? Math.min(
+        cash,
+        seedEstate.heirs
+          .filter((h) => !payoutPaidOut(h.id))
+          .reduce((sum, h) => sum + (h.country === "US" ? PAYOUT_FEE_CENTS : CROSS_BORDER_FEE_RESERVE_CENTS), 0),
+      )
+    : 0;
   const facts: EstateFacts = {
     ...seedEstate,
     cashCents: cash - feeReserve,

@@ -7,6 +7,10 @@ import type { Store } from "@/lib/ledger/store";
 export const VISITOR_ESTATES_PER_DAY = 5;
 /** Estates per day that may move sandbox money. Each full run costs about $46,400 of the fake balance. */
 export const LIVE_MONEY_RUNS_PER_DAY = 6;
+/** Estates that one visitor can start moving money with in a day. */
+export const VISITOR_MONEY_RUNS_PER_DAY = 3;
+/** Live AI reads per visitor per day, however many cookies they clear. */
+export const VISITOR_READS_PER_DAY = 12;
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -24,9 +28,10 @@ export async function mayStartEstate(s: Store, visitor: string): Promise<boolean
 }
 
 /** An estate that has already started moving money may finish. New ones count against the daily cap. */
-export async function mayMoveMoney(s: Store, workspace: string): Promise<boolean> {
+export async function mayMoveMoney(s: Store, workspace: string, visitor = "unknown"): Promise<boolean> {
   const events = await s.list(workspace);
   if (events.some((e) => e.type === "payment_requested")) return true;
+  if (!(await s.bump(`money-runs:${visitor}:${today()}`, VISITOR_MONEY_RUNS_PER_DAY))) return false;
   return s.bump(`money-runs:${today()}`, LIVE_MONEY_RUNS_PER_DAY);
 }
 

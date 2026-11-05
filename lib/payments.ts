@@ -14,6 +14,9 @@ import {
 } from "@/lib/paypal/payouts";
 import { PayPalUnavailable } from "@/lib/paypal/client";
 
+/** Keeps the record readable and the database small if someone loops on a refused payment. */
+const MAX_BLOCKED_LOGGED = 40;
+
 const hash = (s: string) => createHash("sha256").update(s).digest("hex").slice(0, 24);
 
 /** Number of money events so far. A token is only good for the state it was issued against. */
@@ -28,6 +31,12 @@ const payeeName = (state: EstateState, target: Target) =>
     ? (state.facts.heirs.find((h) => h.id === target.id)?.name ?? target.id)
     : (state.claims.find((c) => c.id === target.id)?.creditor ?? target.id);
 
+export function targetExists(state: EstateState, target: Target): boolean {
+  return target.kind === "heir"
+    ? state.plan.heirs.some((h) => h.heirId === target.id)
+    : state.plan.claimLines.some((l) => l.claimId === target.id);
+}
+
 function checkTarget(state: EstateState, target: Target, amountCents: number): PaymentCheck {
   if (target.kind === "heir") return checkHeirPayment(state.plan, target.id, amountCents);
   const check = checkClaimPayment(state.plan, target.id);
@@ -40,9 +49,11 @@ function checkTarget(state: EstateState, target: Target, amountCents: number): P
 export async function checkPayment(workspace: string, target: Target, amountCents: number, s: Store = store()) {
   const events = await s.list(workspace);
   const state = buildState(events);
+  if (!targetExists(state, target)) return null;
   const check = checkTarget(state, target, amountCents);
   const v = version(events);
-  if (!check.allowed) {
+  const blockedSoFar = events.filter((e) => e.type === "payment_blocked").length;
+  if (!check.allowed && blockedSoFar < MAX_BLOCKED_LOGGED) {
     await s.append(workspace, "payment_blocked", {
       target,
       payee: payeeName(state, target),
@@ -63,9 +74,21 @@ export type PayResult =
   | { ok: true; duplicate: boolean; payment: PaymentRecord }
   | { ok: false; reason: "blocked"; blocks: Block[]; safeCents: number }
   | { ok: false; reason: "failed"; message: string; simulated: boolean; payment?: PaymentRecord }
-  | { ok: false; reason: "bad_token" | "no_receiver"; message: string };
+  | { ok: false; reason: "bad_token" | "no_receiver" | "limit" | "stale"; message: string };
+
+const STALE_MESSAGE = "Another payment went through while this one was being approved, so nothing was sent. Please check the amount again.";
+
+/** Counts money events before this one. If that isn't what the approval was issued against, the approval is stale. */
+async function lostRace(s: Store, workspace: string, ledgerId: string, v: number): Promise<boolean> {
+  const events = await s.list(workspace);
+  const mine = events.find((e) => e.type === "payment_requested" && e.data.ledgerId === ledgerId);
+  if (!mine) return false;
+  return events.filter((e) => e.type === "payment_requested" && e.seq < mine.seq).length !== v;
+}
 
 export interface PayOptions {
+  /** Runs only once a payment has passed every check, so refused requests can't use up the daily limits. */
+  gate?: () => Promise<boolean>;
   auto?: boolean;
   simulateNote?: string;
   store?: Store;
@@ -91,11 +114,16 @@ export async function pay(
   if (already) return { ok: true, duplicate: true, payment: already };
 
   const state = buildState(events);
+  if (!targetExists(state, target)) return { ok: false, reason: "bad_token", message: "That payee isn't part of this estate." };
   const check = checkTarget(state, target, amountCents);
   if (!check.allowed) return { ok: false, reason: "blocked", blocks: check.blocks, safeCents: check.safeCents };
 
   const receiver = receiverFor(target);
   if (!receiver) return { ok: false, reason: "no_receiver", message: "No sandbox account is set for this payee." };
+
+  if (opts.gate && !(await opts.gate())) {
+    return { ok: false, reason: "limit", message: "limit" };
+  }
 
   const { duplicate } = await s.append(
     workspace,
@@ -106,6 +134,12 @@ export async function pay(
   if (duplicate) {
     const again = buildState(await s.list(workspace)).payments.find((p) => p.ledgerId === ledgerId);
     if (again) return { ok: true, duplicate: true, payment: again };
+  }
+
+  // Two different payments approved at the same moment: the first one in wins, the other is undone before PayPal is called.
+  if (await lostRace(s, workspace, ledgerId, v)) {
+    await s.append(workspace, "payment_failed", { ledgerId, message: "Superseded by another payment", simulated: false }, `failed:${ledgerId}`);
+    return { ok: false, reason: "stale", message: STALE_MESSAGE };
   }
 
   const items: PayoutItem[] = [{ ledgerId, receiver, amountCents, note: `Estate of Ruth Calloway: ${payeeName(state, target)}` }];
@@ -144,7 +178,7 @@ async function send(
 }
 
 /** Pays claims in the order the law sets, as one batch. Each is checked as if the ones before it were paid. */
-export async function payClaimsInOrder(workspace: string, claimIds: string[], opts: { store?: Store } = {}) {
+export async function payClaimsInOrder(workspace: string, claimIds: string[], opts: { store?: Store; gate?: () => Promise<boolean> } = {}) {
   const s = opts.store ?? store();
   const events = await s.list(workspace);
   const state = buildState(events);
@@ -181,6 +215,8 @@ export async function payClaimsInOrder(workspace: string, claimIds: string[], op
   const receiver = receiverFor({ kind: "claim", id: "any" });
   if (!receiver) return { ok: false as const, reason: "no_receiver" as const };
 
+  if (opts.gate && !(await opts.gate())) return { ok: false as const, reason: "limit" as const };
+
   const batchToken = hash(`${workspace}|claims|${order.join(",")}|${v}`);
   const items: PayoutItem[] = [];
   for (const { claimId, owed } of planned) {
@@ -193,6 +229,12 @@ export async function payClaimsInOrder(workspace: string, claimIds: string[], op
       `pay:${ledgerId}`,
     );
     items.push({ ledgerId, receiver, amountCents: owed, note: `Estate of Ruth Calloway: ${payeeName(state, target)}` });
+  }
+  if (items[0] && (await lostRace(s, workspace, items[0].ledgerId, v))) {
+    for (const item of items) {
+      await s.append(workspace, "payment_failed", { ledgerId: item.ledgerId, message: "Superseded by another payment", simulated: false }, `failed:${item.ledgerId}`);
+    }
+    return { ok: false as const, reason: "stale" as const, message: STALE_MESSAGE };
   }
   const result = await send(s, workspace, `la-${batchToken}`, items);
   return { ok: result.ok as boolean, reason: result.ok ? undefined : ("failed" as const), result };

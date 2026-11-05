@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { PayPalUnavailable } from "@/lib/paypal/client";
 import { store } from "@/lib/ledger/store";
-import { EMPTY_MESSAGE, LIMIT_MESSAGE, mayMoveMoney } from "@/lib/limits";
+import { EMPTY_MESSAGE, LIMIT_MESSAGE, mayMoveMoney, requestIp, visitorKey } from "@/lib/limits";
 import { pay } from "@/lib/payments";
 import { workspaceId } from "@/lib/session";
 
@@ -22,11 +22,15 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: "That payment request wasn't valid." }, { status: 400 });
   const { target, amountCents, token, version, drill } = parsed.data;
   const workspace = await workspaceId();
-  if (!(await mayMoveMoney(store(), workspace))) {
-    return NextResponse.json({ ok: false, reason: "limit", message: LIMIT_MESSAGE, replay: true }, { status: 429 });
-  }
+  const visitor = visitorKey(requestIp(req.headers));
   try {
-    const result = await pay(workspace, target, amountCents, token, version, { simulateNote: drill ? DRILL_NOTE : undefined });
+    const result = await pay(workspace, target, amountCents, token, version, {
+      simulateNote: drill ? DRILL_NOTE : undefined,
+      gate: () => mayMoveMoney(store(), workspace, visitor),
+    });
+    if (!result.ok && result.reason === "limit") {
+      return NextResponse.json({ ok: false, reason: "limit", message: LIMIT_MESSAGE, replay: true }, { status: 429 });
+    }
     const empty = !result.ok && "message" in result && String(result.message).includes("INSUFFICIENT_FUNDS");
     return NextResponse.json(empty ? { ...result, message: EMPTY_MESSAGE, replay: true } : result, { status: result.ok ? 200 : 409 });
   } catch (err) {

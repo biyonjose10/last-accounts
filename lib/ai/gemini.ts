@@ -34,27 +34,33 @@ export async function askModel<T>(ask: Ask<T>): Promise<T> {
   if (ask.image) parts.push({ inlineData: { mimeType: ask.image.mimeType, data: ask.image.base64 } });
 
   let text: string | undefined;
-  try {
-    const res = await client.models.generateContent({
-      model: MODEL,
-      contents: [{ role: "user", parts }],
-      config: {
-        systemInstruction: ask.system,
-        responseMimeType: "application/json",
-        responseJsonSchema: ask.jsonSchema,
-        temperature: 0,
-        maxOutputTokens: 4000,
-        thinkingConfig: { thinkingBudget: 0 },
-      },
-    });
-    text = res.text;
-  } catch (err) {
-    const status = (err as { status?: number }).status;
-    const message = String((err as Error).message ?? "");
-    if (status === 429 || /RESOURCE_EXHAUSTED|rate/i.test(message)) {
-      throw new AiUnavailable("The AI's free quota is used up for now.", "RATE_LIMITED");
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const res = await client.models.generateContent({
+        model: MODEL,
+        contents: [{ role: "user", parts }],
+        config: {
+          systemInstruction: ask.system,
+          responseMimeType: "application/json",
+          responseJsonSchema: ask.jsonSchema,
+          temperature: 0,
+          maxOutputTokens: 4000,
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      });
+      text = res.text;
+      break;
+    } catch (err) {
+      const status = (err as { status?: number }).status;
+      const message = String((err as Error).message ?? "");
+      if (status === 429 || /RESOURCE_EXHAUSTED/i.test(message)) {
+        throw new AiUnavailable("The AI's free quota is used up for now.", "RATE_LIMITED");
+      }
+      // Logs the status only, never the document's contents.
+      console.error("AI call failed:", status ?? "no status", `attempt ${attempt}`);
+      if (attempt >= 2) throw new AiUnavailable("The AI couldn't be reached.", "MODEL_ERROR");
+      await new Promise((r) => setTimeout(r, 1500));
     }
-    throw new AiUnavailable("The AI couldn't be reached.", "MODEL_ERROR");
   }
 
   try {

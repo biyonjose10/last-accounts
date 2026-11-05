@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { newMemoryStore } from "@/lib/ledger/store";
 import {
   LIVE_MONEY_RUNS_PER_DAY,
+  VISITOR_MONEY_RUNS_PER_DAY,
   VISITOR_ESTATES_PER_DAY,
   mayMoveMoney,
   mayStartEstate,
@@ -33,15 +34,22 @@ describe("visitor limits", () => {
 describe("the daily cap on live money runs", () => {
   it("stops new estates from moving money past the cap", async () => {
     const s = newMemoryStore();
-    for (let i = 0; i < LIVE_MONEY_RUNS_PER_DAY; i++) expect(await mayMoveMoney(s, `w${i}`)).toBe(true);
-    expect(await mayMoveMoney(s, "one-too-many")).toBe(false);
+    for (let i = 0; i < LIVE_MONEY_RUNS_PER_DAY; i++) expect(await mayMoveMoney(s, `w${i}`, `v${i}`)).toBe(true);
+    expect(await mayMoveMoney(s, "one-too-many", "new-visitor")).toBe(false);
+  });
+
+  it("stops one visitor taking them all by clearing cookies", async () => {
+    const s = newMemoryStore();
+    for (let i = 0; i < VISITOR_MONEY_RUNS_PER_DAY; i++) expect(await mayMoveMoney(s, `w${i}`, "same")).toBe(true);
+    expect(await mayMoveMoney(s, "another-cookie", "same")).toBe(false);
+    expect(await mayMoveMoney(s, "someone-else", "other")).toBe(true);
   });
 
   it("lets an estate already moving money finish, even past the cap", async () => {
     const s = newMemoryStore();
     await s.append("started", "payment_requested", {});
-    for (let i = 0; i < LIVE_MONEY_RUNS_PER_DAY; i++) await mayMoveMoney(s, `w${i}`);
-    expect(await mayMoveMoney(s, "started")).toBe(true);
+    for (let i = 0; i < LIVE_MONEY_RUNS_PER_DAY; i++) await mayMoveMoney(s, `w${i}`, `v${i}`);
+    expect(await mayMoveMoney(s, "started", "v0")).toBe(true);
   });
 
   it("finds the estate a PayPal event belongs to", async () => {

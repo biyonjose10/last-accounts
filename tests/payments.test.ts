@@ -39,7 +39,7 @@ async function payAllClaims() {
 
 describe("paying heirs", () => {
   it("blocks full share with an unpaid federal claim, calls nobody, and records the attempt", async () => {
-    const check = await checkPayment(WS, { kind: "heir", id: "tom" }, 1_000_000, s);
+    const check = (await checkPayment(WS, { kind: "heir", id: "tom" }, 1_000_000, s))!;
     expect(check.allowed).toBe(false);
     expect(check.token).toBeNull();
     expect(payBatch).not.toHaveBeenCalled();
@@ -63,7 +63,7 @@ describe("paying heirs", () => {
     await payAllClaims();
     payBatch.mockClear();
     const tom = { kind: "heir", id: "tom" } as const;
-    const first = await checkPayment(WS, tom, 1_470_000, s);
+    const first = (await checkPayment(WS, tom, 1_470_000, s))!;
     expect(first.allowed).toBe(false);
     expect(first.safeCents).toBeGreaterThan(0);
     expect(first.blocks.map((b) => b.code)).toContain("CLAIM_WINDOW_OPEN");
@@ -84,10 +84,77 @@ describe("paying heirs", () => {
     const ids = payBatch.mock.calls.map((c) => c[0]);
     expect(ids[0]).toMatch(/^la-/);
     payBatch.mockClear();
-    const check = await checkPayment(WS, { kind: "heir", id: "dana" }, 100, s);
+    const check = (await checkPayment(WS, { kind: "heir", id: "dana" }, 100, s))!;
     await pay(WS, { kind: "heir", id: "dana" }, 100, check.token as string, check.version, { store: s });
     await pay(WS, { kind: "heir", id: "dana" }, 100, check.token as string, check.version, { store: s });
     expect(payBatch).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("two different payments approved at the same moment", () => {
+  it("sends only the first, and leaves the other unpaid", async () => {
+    await payAllClaims();
+    payBatch.mockClear();
+    const tom = { kind: "heir", id: "tom" } as const;
+    const check = (await checkPayment(WS, tom, 100_000, s))!;
+    const tokenB = approvalToken(WS, tom, 99_999, check.version);
+    const results = await Promise.all([
+      pay(WS, tom, 100_000, check.token as string, check.version, { store: s }),
+      pay(WS, tom, 99_999, tokenB, check.version, { store: s }),
+    ]);
+    expect(results.filter((r) => r.ok)).toHaveLength(1);
+    expect(payBatch).toHaveBeenCalledTimes(1);
+    expect((await state()).facts.distributedCents.tom).toBe(100_000);
+  });
+
+  it("refuses an approval issued before another payment went through", async () => {
+    await payAllClaims();
+    const tom = { kind: "heir", id: "tom" } as const;
+    const old = (await checkPayment(WS, tom, 100_000, s))!;
+    const other = (await checkPayment(WS, { kind: "heir", id: "dana" }, 100_000, s))!;
+    await pay(WS, { kind: "heir", id: "dana" }, 100_000, other.token as string, other.version, { store: s });
+    const r = await pay(WS, tom, 100_000, old.token as string, old.version, { store: s });
+    expect(r).toMatchObject({ ok: false, reason: "stale" });
+  });
+});
+
+describe("the daily limits", () => {
+  it("aren't used up by refused or forged requests", async () => {
+    const gate = vi.fn().mockResolvedValue(true);
+    await pay(WS, { kind: "heir", id: "tom" }, 100, "forged", 0, { store: s, gate });
+    const token = approvalToken(WS, { kind: "heir", id: "tom" }, 1_000_000, 0);
+    await pay(WS, { kind: "heir", id: "tom" }, 1_000_000, token, 0, { store: s, gate });
+    await payClaimsInOrder(WS, ["card"], { store: s, gate });
+    expect(gate).not.toHaveBeenCalled();
+  });
+
+  it("stop a valid payment when reached, without calling PayPal", async () => {
+    const r = await payClaimsInOrder(WS, ALL_CLAIMS, { store: s, gate: async () => false });
+    expect(r).toMatchObject({ ok: false, reason: "limit" });
+    expect(payBatch).not.toHaveBeenCalled();
+    expect((await state()).payments).toHaveLength(0);
+  });
+});
+
+describe("transfer fees at the end", () => {
+  it("sets aside enough for the payout abroad, then releases it once she's paid", async () => {
+    await s.append(WS, "date_advanced", { to: "2026-12-02" });
+    expect((await state()).feeReserveCents).toBe(25 + 25 + 2_000);
+    await payAllClaims();
+    const aoife = { kind: "heir", id: "aoife" } as const;
+    const check = (await checkPayment(WS, aoife, 200_000, s))!;
+    await pay(WS, aoife, 200_000, check.token as string, check.version, { store: s });
+    expect((await state()).feeReserveCents).toBe(25 + 25);
+  });
+});
+
+describe("an unknown payee", () => {
+  it("is refused cleanly, without touching PayPal", async () => {
+    expect(await checkPayment(WS, { kind: "claim", id: "no-such-claim" }, 100, s)).toBeNull();
+    const token = approvalToken(WS, { kind: "claim", id: "no-such-claim" }, 100, 0);
+    const r = await pay(WS, { kind: "claim", id: "no-such-claim" }, 100, token, 0, { store: s });
+    expect(r.ok).toBe(false);
+    expect(payBatch).not.toHaveBeenCalled();
   });
 });
 
