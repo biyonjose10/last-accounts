@@ -90,6 +90,10 @@ export function buildState(events: LedgerEvent[]): EstateState {
         asOf = e.data.to;
         simulatedDate = true;
         break;
+      case "date_reverted":
+        asOf = e.data.to;
+        simulatedDate = false;
+        break;
       case "claim_added":
         claims = claims.filter((c) => c.id !== e.data.claim.id).concat(e.data.claim);
         break;
@@ -212,6 +216,22 @@ export function buildState(events: LedgerEvent[]): EstateState {
 }
 
 /** Sandbox email for each payee. Fake addresses, set in the environment. */
+/** Anything that moves or frees money after the date jump pins the date there. */
+const PINNING = new Set(["payment_requested", "order_created", "order_captured", "claim_released"]);
+
+/**
+ * Whether the simulated date can go back to the real one. Only while nothing has moved since the jump,
+ * because a payment made after the window closed was checked against rules that no longer apply before it.
+ */
+export function canGoBack(events: { type: string }[]): boolean {
+  let last = -1;
+  events.forEach((e, i) => {
+    if (e.type === "date_advanced") last = i;
+    if (e.type === "date_reverted") last = -1;
+  });
+  return last >= 0 && !events.slice(last + 1).some((e) => PINNING.has(e.type));
+}
+
 export function receiverFor(target: Target): string | undefined {
   if (target.kind === "heir") {
     return {

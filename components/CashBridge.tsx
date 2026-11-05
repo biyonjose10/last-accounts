@@ -1,6 +1,28 @@
 "use client";
 
-import { Figure } from "./Figure";
+import { useEffect, useRef, useState } from "react";
+import { usd } from "@/lib/ledger/describe";
+
+/** The figure over a bar. When it changes, the old one is struck through, then fades. */
+function BarFigure({ cents, sign }: { cents: number; sign: string }) {
+  const last = useRef(cents);
+  const [previous, setPrevious] = useState<number | null>(null);
+  useEffect(() => {
+    if (last.current === cents) return;
+    setPrevious(last.current);
+    last.current = cents;
+    const t = window.setTimeout(() => setPrevious(null), 2600);
+    return () => window.clearTimeout(t);
+  }, [cents]);
+  return (
+    <span className="bar-figure">
+      {previous !== null && (
+        <span key={previous} className="struck fading" aria-label={`was ${usd(previous)}`}>{usd(previous)}</span>
+      )}
+      <span className="figure-sm">{sign && <span className="sign">{sign}</span>}{usd(cents)}</span>
+    </span>
+  );
+}
 
 interface Step {
   key: string;
@@ -59,10 +81,7 @@ export function CashBridge({
                 className={`bar ${s.key}${s.connect ? ` conn-${s.connect}` : ""}`}
                 style={{ bottom: pct(s.from), height: `max(2px, ${pct(s.to - s.from)})` }}
               >
-                <span className="bar-figure">
-                  {s.sign && <span className="sign">{s.sign}</span>}
-                  <Figure cents={s.cents} className="figure-sm" />
-                </span>
+                <BarFigure cents={s.cents} sign={s.sign} />
               </div>
             </div>
             <p className="bridge-label">{s.label}</p>

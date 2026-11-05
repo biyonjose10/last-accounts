@@ -30,6 +30,8 @@ export function describe(e: LedgerEvent): RecordLine | null {
       return { who: d.simulated ? "Drill" : "PayPal", text: `${d.simulated ? "Simulated failure" : "Payment failed"}: ${d.message}. Nothing left the estate, so it's still owed.` };
     case "date_advanced":
       return { who: "Clock", text: `Simulated date moved to ${longDate(d.to)}.` };
+    case "date_reverted":
+      return { who: "Clock", text: `Date moved back to ${longDate(d.to)}. Nothing had moved since the jump.` };
     case "claim_added":
       return { who: "Agent", text: `Logged a claim from ${d.claim.creditor} for ${usd(d.claim.amountCents)}. ${d.reason ?? ""}`.trim() };
     case "claim_released":

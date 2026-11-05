@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Block, PaymentCheck } from "@/lib/engine/types";
 import { describe, longDate, usd } from "@/lib/ledger/describe";
-import type { EstateState, PaymentRecord, Target } from "@/lib/ledger/state";
+import { canGoBack, type EstateState, type PaymentRecord, type Target } from "@/lib/ledger/state";
 import { CarSale } from "./CarSale";
 import { FaultDrill, type Drills } from "./FaultDrill";
 import { Figure } from "./Figure";
@@ -92,6 +92,8 @@ export function EstateApp({ clientId }: { clientId: string }) {
 
   const [drills, setDrills] = useState<Drills>({ failNextPayout: false, declineNextCapture: false, aiOff: false });
   const [receipt, setReceipt] = useState<ReceiptRef | null>(null);
+  // The date switch moves as soon as it's clicked; the page catches up when the server answers.
+  const [pendingDate, setPendingDate] = useState<"open" | "closed" | null>(null);
   const closeReceipt = useCallback(() => setReceipt(null), []);
 
   const refresh = useCallback(async (): Promise<EstateState> => {
@@ -209,12 +211,15 @@ export function EstateApp({ clientId }: { clientId: string }) {
     setBusy(false);
   }
 
-  async function advanceDate() {
+  async function moveDate(to: "after" | "start") {
     setBusy(true);
+    setPendingDate(to === "after" ? "closed" : "open");
     setCheck(null);
-    await post("/api/date");
+    const res = await post("/api/date", { to });
+    if (!res.ok) setNotice({ kind: "fail", text: res.json.error ?? "The date couldn't be changed." });
     setAmount("");
     await refresh();
+    setPendingDate(null);
     setBusy(false);
   }
 
@@ -251,11 +256,16 @@ export function EstateApp({ clientId }: { clientId: string }) {
       <div className="topbar">
         <Segmented
           label="Date"
-          value={plan.windowOpen ? "open" : "closed"}
+          value={pendingDate ?? (plan.windowOpen ? "open" : "closed")}
           disabled={busy}
-          onChange={(v) => { if (v === "closed") advanceDate(); }}
+          onChange={(v) => moveDate(v === "closed" ? "after" : "start")}
           options={[
-            { value: "open", label: "Window open", disabled: !plan.windowOpen, title: plan.windowOpen ? undefined : "Start the estate again to go back" },
+            {
+              value: "open",
+              label: "Window open",
+              disabled: !plan.windowOpen && !canGoBack(state.events),
+              title: plan.windowOpen || canGoBack(state.events) ? undefined : "Money has moved since the jump. Start the estate again to go back.",
+            },
             { value: "closed", label: "After the window (simulated)" },
           ]}
         />

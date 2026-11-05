@@ -121,7 +121,11 @@ a { color: inherit; }
 .bar.conn-top::after { top: -1px; }
 .bar.conn-bottom::after { bottom: -1px; }
 .bar-figure { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); text-align: center; white-space: nowrap; }
-.bar-figure .struck { display: block; margin: 0 auto 1px; width: max-content; }
+.bar-figure .struck { position: absolute; bottom: 100%; left: 50%; translate: -50% 0; width: max-content; }
+.struck.fading { animation: fade-away 2600ms ease-in both; }
+.struck.fading::after { animation: strike 400ms ease-out both; }
+@keyframes fade-away { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+.bar-figure .figure-sm { display: inline-flex; align-items: baseline; gap: 2px; }
 .sign { font-family: var(--font-figures); font-size: 14px; color: var(--muted); margin-right: 2px; }
 .figure-sm { font-family: var(--font-figures); font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .bridge-label { margin: 10px 0 0; text-align: center; font-size: 13px; color: var(--muted); }

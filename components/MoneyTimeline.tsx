@@ -64,7 +64,7 @@ function paymentDates(state: EstateState) {
   const settled = new Map<string, string>();
   let date = START_DATE;
   for (const e of state.events) {
-    if (e.type === "date_advanced") date = e.data.to;
+    if (e.type === "date_advanced" || e.type === "date_reverted") date = e.data.to;
     else if (e.type === "payment_requested") requested.set(e.data.ledgerId, date);
     else if (e.type === "payment_settled") settled.set(e.data.ledgerId, date);
   }

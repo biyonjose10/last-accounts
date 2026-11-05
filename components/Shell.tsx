@@ -19,6 +19,22 @@ export function Shell({ nav, pages, footer, children }: { nav: NavItem[]; pages?
   const [active, setActive] = useState<string>(sections[0]?.href ?? pathname);
   const list = useRef<HTMLUListElement>(null);
   const [marker, setMarker] = useState<{ top: number; height: number } | null>(null);
+  const clicked = useRef(false);
+  const clicks = useRef(0);
+
+  function choose(href: string) {
+    setActive(href);
+    clicked.current = true;
+    const mine = ++clicks.current;
+    const release = () => {
+      // An older click's timer mustn't release a newer click.
+      if (clicks.current === mine) clicked.current = false;
+      window.removeEventListener("scrollend", release);
+    };
+    window.addEventListener("scrollend", release);
+    // Browsers without scrollend, or a click that doesn't scroll.
+    window.setTimeout(release, 2000);
+  }
 
   // Follow the section nearest the top of the screen.
   useEffect(() => {
@@ -27,6 +43,7 @@ export function Shell({ nav, pages, footer, children }: { nav: NavItem[]; pages?
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) seen.set(`#${e.target.id}`, e.isIntersecting);
+        if (clicked.current) return;
         const first = sections.find((s) => seen.get(s.href));
         if (first) setActive(first.href);
       },
@@ -59,7 +76,7 @@ export function Shell({ nav, pages, footer, children }: { nav: NavItem[]; pages?
             {nav.map((n) => (
               <li key={n.href}>
                 {n.href.startsWith("#") ? (
-                  <a href={n.href} data-href={n.href} className={current === n.href ? "on" : undefined} onClick={() => setActive(n.href)}>
+                  <a href={n.href} data-href={n.href} className={current === n.href ? "on" : undefined} onClick={() => choose(n.href)}>
                     {n.label}
                   </a>
                 ) : (
