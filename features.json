@@ -26,14 +26,16 @@
       "id": "P0-4",
       "phase": 0,
       "name": "Balances API returns the estate balance",
-      "passes": false,
+      "passes": true,
+      "evidence": "6 Nov ~03:45 IST: GET /v1/reporting/balances returned the Estate's USD balance, $69,680.05 available, as_of 2026-11-05T19:59:59Z, hours behind live activity. Works, but lags, so the app never shows it as live and builds accounting from each payout's and order's own record instead.",
       "note": "API answers, but showed $5,000 with a stale refresh time on 5 Nov. Recheck later."
     },
     {
       "id": "P0-5",
       "phase": 0,
       "name": "Transaction Search returns the proof transactions",
-      "passes": false,
+      "passes": true,
+      "evidence": "6 Nov ~03:45 IST: GET /v1/reporting/transactions over the last 25 days returned the sandbox proof transactions (e.g. 98181761GT713751C +$5,000.00, 2LN11898SX1635923 -$25.25, 4MU61273AV755412E -$1.25) with running balances. Same lag as Balances; used only as a later cross-check, not in the app.",
       "note": "API answers, but proof transactions not yet listed. Recheck later."
     },
     {
@@ -228,7 +230,8 @@
       "id": "P5-4",
       "phase": 5,
       "name": "Daily cap switches to a labelled replay of a real run",
-      "passes": false
+      "passes": true,
+      "evidence": "6 Nov ~03:40 IST on the hosted site: set today's global money-run counter to the cap (6) in Neon, then pressed 'Approve: pay 5 claims' on an estate that hadn't moved money. The page showed 'Today's live sandbox payments are used up... You can watch a labelled replay of a real run instead.' with a link to /replay (200, 10 real payments). No payment was created. Counter restored to 1 afterwards; no visitor counters left behind."
     },
     {
       "id": "P5-5",
@@ -261,7 +264,8 @@
       "id": "P6-4",
       "phase": 6,
       "name": "Leak-checker clean on full history",
-      "passes": false
+      "passes": true,
+      "evidence": "6 Nov: leak-checker over HEAD and all 20 commits found no secrets (no PayPal client ID/secret, Gemini key, DATABASE_URL, webhook ID, tokens, passwords) and no .env, .vercel or proof files ever committed. Identity items for sir to decide before going public: real name in LICENSE, Gmail in commit metadata, Windows path in PLAN.md (removed from HEAD)."
     },
     {
       "id": "P6-5",

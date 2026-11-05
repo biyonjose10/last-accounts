@@ -1,6 +1,6 @@
 # Last Accounts: plan for the PayPal AI Hackathon
 
-Saved as `C:\Users\biyon\projects\paypal-ai-hack\PLAN.md` once approved. No code before that.
+Saved as `PLAN.md` in this repository once approved. No code before that.
 
 ## Context
 

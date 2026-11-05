@@ -30,27 +30,27 @@ You need a desktop browser and this sandbox login for Tom, the brother who buys 
 
 Steps:
 
-1. Open https://last-accounts.vercel.app. There is no sign-up. You get your own fictional estate. The totals read: **Cash in the estate** $46,400.00, **Owed to creditors** $21,400.00, **Held back** $10,560.00, **Safe to distribute today** $14,440.00.
-2. In **Pay an heir**, leave **Who** on Tom Calloway. **Amount, USD** is filled in with his full share, 14700.00. Click **Send payment**.
-3. A red panel opens: **Stop. This could put the money on you.** It names the unpaid US Treasury claim and the creditor window, open until December 1, 2026, and links each statute. It also says nothing can safely go to Tom yet.
-4. Under **Creditors, in the order Florida law sets**, click **Approve: pay 5 claims in legal order**. This sends one sandbox Payouts batch for $21,400. Wait a few seconds until each line shows **Paid** with a PayPal transaction ID. The funeral home appears twice: $6,000 in Class 2 and the $2,240 above the cap in Class 8.
-5. Click **Send payment** again. The panel now offers an approval for the safe amount, **Approve $6,219.51 to Tom Calloway**. That is $6,220 less the PayPal fees on the creditor payouts (five at $0.25). If you click before those fees settle, it shows $6,220.00. Approve it. This is a real sandbox payout, and its ID appears under **Latest payment**.
-6. Look at **Who gets paid, and when**, the money timeline. Each row is a person or creditor, and each bar comes from the ledger.
-7. In **Tom wants to keep the car**, click the PayPal button and sign in as Tom. Close the PayPal window once if you want to see the cancel path: *Tom cancelled. Nothing was paid, and the car stays in the estate.* Then buy it. The section changes to **Sold to Tom.**, with the amount paid, PayPal's fee, what reached the estate and the capture ID. Figures that changed stay on the page, struck through.
+1. Open https://last-accounts.vercel.app. There is no sign-up. You get your own fictional estate. The headline reads **$14,440 is safe for the family. $31,960 waits for creditors and claims.** The chart under it, **Where the money stands**, goes from $46,400.00 in cash, minus $21,400.00 owed to creditors, minus $10,560.00 held back, to $14,440.00. The **What to try** checklist ticks itself as you go, and the sidebar jumps to each section.
+2. In **Pay an heir**, leave **Who** on Tom. **Amount, USD** is filled in with his full share, 14700.00. Click **Send payment**.
+3. A red panel opens: **Stop. This could put the money on you.** It names the unpaid US Treasury claim and the creditor window, open until December 1, 2026, and links each statute. On the right, **What you can do** says nothing can safely go to Tom yet, and points to the creditors.
+4. Under **Creditors, in the order Florida law sets**, click **Approve: pay 5 claims in legal order**. This sends one sandbox Payouts batch for $21,400. A receipt prints over the page and fills in when PayPal confirms; press Esc to close it. Each line then shows **Paid** with a PayPal transaction ID, and clicking any **Paid** badge reopens its receipt. The funeral home appears twice: $6,000 in Class 2 and the $2,240 above the cap in Class 8.
+5. Click **Send payment** again. The panel now offers an approval for the safe amount, **Approve $6,219.51 to Tom Calloway**. That is $6,220 less the PayPal fees on the creditor payouts (five at $0.25). If you click before those fees settle, it shows $6,220.00. Approve it in **What you can do**. This is a real sandbox payout: its receipt prints, and its ID appears under **Latest payment**.
+6. Look at **Who gets paid, and when**, the money timeline. Each row is a person or creditor, and each bar comes from the ledger. Click a **Paid** bar to open its receipt.
+7. In **Tom wants to keep the car**, click the PayPal button and sign in as Tom. Close the PayPal window once if you want to see the cancel path: *Tom cancelled. Nothing was paid, and the car stays in the estate.* Then buy it. A receipt prints, and the section changes to **Sold to Tom**, with the amount paid, PayPal's fee, what reached the estate and the capture ID. In the chart at the top, each changed figure is struck through before the new one settles.
 8. In **The paperwork**, click **Read** beside the will. Gemini reads the page image. Each fact shows its quote, tagged **On the page** or **Not on the page, ignored**.
 9. Under **New in the post**, click **Open and read** beside the Northgate Recovery Partners demand letter. You should see **This letter tries to instruct software.**, with the hidden line quoted, and *Suspected fake. $4,400.00 reserved, and not paid.*
-10. Click **Open and read** beside the Clerk of Court notice. This is the agent's one job with money: if the $95 fee is accepted, it is paid without approval. **The record** shows it as *Paid under its limits*.
-11. Near the top, click **Simulate: jump past the window**. The date moves to December 2, 2026 and is labelled **Simulated date**. On the Northgate row, click **Nothing was filed in court by the deadline: release this reserve**.
+10. Click **Open and read** beside the Clerk of Court notice. The panel **What the agent may do alone**, above the documents, lists its limits and what it has spent. This is the agent's one job with money: if the $95 fee is accepted, it is paid without approval. **The record** shows it as *Paid under its limits*.
+11. At the top, switch the date to **After the window (simulated)**. The date moves to December 2, 2026 and is labelled **Simulated date**. You can switch back to **Window open** as long as no money has moved since. On the Northgate row, click **Nothing was filed in court by the deadline: release this reserve**.
 12. In **Pay an heir**, choose Aoife Calloway, click **Send payment**, then **Approve $2,000.00**. Do the same for Dana Calloway and Tom Calloway, waiting for each to confirm. If cents have moved because a fee settled, the panel offers the exact safe amount instead.
-13. In the footer, click **Final account**. Every line is read back from PayPal at that moment and compared with the ledger.
+13. Once everyone is paid, the chart at the top becomes **Where the money went**, with a receipt for every payment. In the sidebar, click **Final account**. Every line is read back from PayPal at that moment and compared with the ledger.
 
 To try the failures, use **Fault drill**. Each one is labelled as simulated.
 
-- Tick **Make the next heir payout fail**, then pay an heir. The row shows **Failed, still owed**.
-- Before buying the car, tick **Decline the car payment at capture**, then buy it. No credit is given. Untick the box, then click **Retry the capture**.
-- Tick **Turn the AI off**, then read a document. A saved reading is shown, and a new letter is held for Dana.
+- Turn on **Make the next heir payout fail**, then pay an heir. The row shows **Failed, still owed**.
+- Before buying the car, turn on **Decline the car payment at capture**, then buy it. No credit is given. Turn it off, then click **Retry the capture**.
+- Turn on **Turn the AI off**, then read a document. A saved reading is shown, and a new letter is held for Dana.
 
-The footer also has **Start this estate again** and **Replay of a real run**.
+The sidebar also has **Start this estate again** and **Replay of a real run**.
 
 ## How it works
 
@@ -262,7 +262,7 @@ npx --yes vercel@65.5.0 --prod --yes
 - **Fixed documents.** There is no upload. The starting claims and estate figures are seeded from `fixtures/scenario.ts`. Reading the starting documents shows the facts but doesn't change the figures. Only the two letters under **New in the post** add claims from a reading.
 - **Quote checks need known text.** Quotes are checked against text stored with each fictional document. Real documents would need their own text extraction.
 - **No login.** A cookie identifies each visitor's estate, and whoever holds it acts as Dana.
-- **Hosted MCP isn't used.** It was reported broken, so the app calls PayPal's REST APIs directly.
+- **Hosted MCP isn't used.** The app calls PayPal's REST APIs directly, so every money call goes through code that is tested and limited.
 - **Bryntum.** The timeline uses Bryntum Scheduler Community. That edition has no time ranges feature, so the shared band and the Today line are my own elements.
 
 ## Licence

@@ -51,7 +51,7 @@ PayPal does all the money movement, through its REST APIs and JavaScript SDK in 
 - **Negative testing.** `PayPal-Mock-Response` declines a capture, and the `ERRPYO002` test value fails a payout. Both drive the Fault drill.
 - **Final account.** Built from each payout's and order's own GET response, with a PayPal ID on each line.
 
-Hosted MCP is not used, because it was reported broken. I call the REST APIs directly instead.
+PayPal's hosted MCP server is not used. The app calls the REST APIs directly, so every money call goes through code I can test and limit.
 
 ## How AI is used
 
@@ -142,17 +142,17 @@ It's all fake money in the PayPal sandbox, and the estate is fictional. Use a de
 
 Steps, in about 3 minutes:
 
-1. In **Pay an heir**, leave Tom Calloway and 14700.00, then click **Send payment**. You'll see **Stop. This could put the money on you.**
-2. Under **Creditors, in the order Florida law sets**, click **Approve: pay 5 claims in legal order**. Wait until each line shows **Paid** with a PayPal ID.
-3. Click **Send payment** again, then the **Approve** button for the safe amount, about $6,220.
+1. In **Pay an heir**, leave Tom and 14700.00, then click **Send payment**. You'll see **Stop. This could put the money on you.**
+2. Under **Creditors, in the order Florida law sets**, click **Approve: pay 5 claims in legal order**. A receipt prints and fills in when PayPal confirms. Each line then shows **Paid** with a PayPal ID; click any **Paid** badge to reopen its receipt.
+3. Click **Send payment** again, then the **Approve** button under **What you can do**, for the safe amount, about $6,220.
 4. In **Tom wants to keep the car**, click the PayPal button, sign in as Tom and approve. Close the window once first if you want to see the cancel path.
-5. In **The paperwork**, under **New in the post**, click **Open and read** on the Northgate letter, then on the Clerk of Court notice. Northgate is marked as a suspected fake and $4,400 is reserved. The agent can pay the $95 fee alone.
-6. Click **Simulate: jump past the window**. On the Northgate row, click **Nothing was filed in court by the deadline: release this reserve**.
+5. In **The paperwork**, under **New in the post**, click **Open and read** on the Northgate letter, then on the Clerk of Court notice. Northgate is marked as a suspected fake and $4,400 is reserved. The agent can pay the $95 fee alone, within the limits shown in **What the agent may do alone**.
+6. At the top, switch the date to **After the window (simulated)**. On the Northgate row, click **Nothing was filed in court by the deadline: release this reserve**.
 7. In **Pay an heir**, pay Aoife Calloway, Dana Calloway and Tom Calloway in turn: **Send payment**, then **Approve**. Wait for each to confirm.
-8. In the footer, click **Final account**. Each line is read back from PayPal.
+8. The chart at the top becomes **Where the money went**. In the sidebar, click **Final account**. Each line is read back from PayPal.
 
-Optional: use **Fault drill** before the matching step. Each failure is labelled as simulated. If you use **Decline the car payment at capture**, untick it before clicking **Retry the capture**.
+Optional: use **Fault drill** before the matching step. Each failure is labelled as simulated. If you use **Decline the car payment at capture**, turn it off before clicking **Retry the capture**.
 
-If a demo limit is reached or the sandbox runs out of fake money, the app says so. **Replay of a real run** in the footer shows a real sandbox run with its PayPal IDs. **Start this estate again** gives you a fresh estate, up to 5 a day.
+If a demo limit is reached or the sandbox runs out of fake money, the app says so. **Replay of a real run** in the sidebar shows a real sandbox run with its PayPal IDs. **Start this estate again** gives you a fresh estate, up to 5 a day.
 
 Full local setup is in the repository's `README.md`.
