@@ -27,6 +27,11 @@ export interface PaymentRecord {
   paypalStatus?: string;
   feeCents: number;
   auto: boolean;
+  /** Fixed for this approval. PayPal refuses a second batch with the same ID, so asking again can't pay twice. */
+  senderBatchId?: string;
+  receiver?: string;
+  /** The call to PayPal got no clear answer. The money stays counted as gone until PayPal's record settles it. */
+  unconfirmed?: boolean;
   failure?: string;
   simulated?: boolean;
 }
@@ -103,6 +108,7 @@ export function buildState(events: LedgerEvent[]): EstateState {
         if (p) {
           p.status = "sent";
           p.batchId = e.data.batchId;
+          p.unconfirmed = false;
         }
         break;
       }
@@ -120,6 +126,11 @@ export function buildState(events: LedgerEvent[]): EstateState {
       case "payment_progress": {
         const p = payments.get(e.data.ledgerId);
         if (p) p.paypalStatus = e.data.paypalStatus;
+        break;
+      }
+      case "payment_unconfirmed": {
+        const p = payments.get(e.data.ledgerId);
+        if (p) p.unconfirmed = true;
         break;
       }
       case "payment_failed": {

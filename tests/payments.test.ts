@@ -201,6 +201,40 @@ describe("a failed payout", () => {
   });
 });
 
+describe("no clear answer from PayPal", () => {
+  it("keeps the money held, doesn't mark it failed, and asks again with the same batch ID", async () => {
+    const { PayPalUnavailable } = await import("@/lib/paypal/client");
+    payBatch.mockRejectedValueOnce(new PayPalUnavailable("Timed out."));
+    const before = (await state()).facts.cashCents;
+    const r = await payClaimsInOrder(WS, ["lawyer"], { store: s });
+    expect(r.ok).toBe(false);
+    const held = await state();
+    expect(held.payments[0]?.status).toBe("requested");
+    expect(held.payments[0]?.unconfirmed).toBe(true);
+    expect(held.facts.cashCents).toBeLessThan(before);
+    const firstId = payBatch.mock.calls[0]![0];
+
+    batchStatus.mockResolvedValue({ batchId: "BATCH1", batchStatus: "PENDING", feesCents: 0, items: [] });
+    await syncPayments(WS, s);
+    expect(payBatch).toHaveBeenCalledTimes(2);
+    expect(payBatch.mock.calls[1]![0]).toBe(firstId);
+    expect((await state()).payments[0]?.status).toBe("sent");
+  });
+
+  it("doesn't allow a fresh payment to double up while one is unconfirmed", async () => {
+    const { PayPalUnavailable } = await import("@/lib/paypal/client");
+    await payAllClaims();
+    payBatch.mockClear();
+    payBatch.mockRejectedValueOnce(new PayPalUnavailable("Timed out."));
+    const tom = { kind: "heir", id: "tom" } as const;
+    const check = (await checkPayment(WS, tom, 622_000, s))!;
+    await pay(WS, tom, 622_000, check.token as string, check.version, { store: s });
+    const again = (await checkPayment(WS, tom, 622_000, s))!;
+    expect(again.allowed).toBe(false);
+    expect((await state()).facts.distributedCents.tom).toBe(622_000);
+  });
+});
+
 describe("paying claims", () => {
   it("won't pay a lower class alone", async () => {
     const r = await payClaimsInOrder(WS, ["card"], { store: s });

@@ -62,8 +62,9 @@ async function accessToken(): Promise<string> {
     },
     true,
   );
-  const body = await res.json();
   if (!res.ok) throw new PayPalUnavailable(`PayPal refused the keys (${res.status}).`);
+  const body = await res.json().catch(() => null);
+  if (!body?.access_token) throw new PayPalUnavailable("PayPal's token response wasn't readable.");
   cached = { token: body.access_token, expires: Date.now() + body.expires_in * 1000 };
   return cached.token;
 }
@@ -72,21 +73,27 @@ export async function paypal<T = any>(
   path: string,
   options: { method?: string; body?: unknown; headers?: Record<string, string>; safeToRepeat?: boolean } = {},
 ): Promise<PayPalResult<T>> {
-  const token = await accessToken();
   const method = options.method ?? "GET";
-  const res = await send(
-    `${BASE}${path}`,
-    {
-      method,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        ...options.headers,
+  const attempt = async () =>
+    send(
+      `${BASE}${path}`,
+      {
+        method,
+        headers: {
+          Authorization: `Bearer ${await accessToken()}`,
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
+        body: options.body === undefined ? undefined : JSON.stringify(options.body),
       },
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
-    },
-    options.safeToRepeat ?? method === "GET",
-  );
+      options.safeToRepeat ?? method === "GET",
+    );
+  let res = await attempt();
+  // An expired token was refused before anything happened, so it's safe to get a new one and try again.
+  if (res.status === 401) {
+    cached = undefined;
+    res = await attempt();
+  }
   const text = await res.text();
   let json: any = {};
   try {

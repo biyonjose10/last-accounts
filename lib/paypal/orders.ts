@@ -35,7 +35,8 @@ export async function captureOrder(orderId: string, opts: { simulateDecline?: bo
   }
   const capture = res.json?.purchase_units?.[0]?.payments?.captures?.[0];
   if (!capture || capture.status !== "COMPLETED") {
-    return { kind: "failed", issue: String(capture?.status ?? "NO_CAPTURE"), message: "PayPal didn't report a completed capture." };
+    // PENDING and similar aren't declines. No credit is given, and PayPal's record decides later.
+    return { kind: "failed", issue: `CAPTURE_${String(capture?.status ?? "NOT_REPORTED")}`, message: "PayPal hasn't reported a completed capture." };
   }
   const b = capture.seller_receivable_breakdown;
   const gross = toCents(capture.amount.value);

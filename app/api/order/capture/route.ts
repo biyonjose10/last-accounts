@@ -30,8 +30,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, captureId: outcome.captureId });
   } catch (err) {
     if (err instanceof PayPalUnavailable) {
-      await s.append(workspace, "order_capture_failed", { orderId, message: err.message, simulated: false });
-      return NextResponse.json({ ok: false, message: err.message }, { status: 503 });
+      // PayPal may have captured it. No credit until it confirms, and retrying uses the same request ID, so it can't charge twice.
+      const message = "PayPal didn't give a clear answer, so nothing is credited yet. Retrying is safe";
+      await s.append(workspace, "order_capture_failed", { orderId, message, simulated: false });
+      return NextResponse.json({ ok: false, message }, { status: 503 });
     }
     throw err;
   }

@@ -74,7 +74,7 @@ export type PayResult =
   | { ok: true; duplicate: boolean; payment: PaymentRecord }
   | { ok: false; reason: "blocked"; blocks: Block[]; safeCents: number }
   | { ok: false; reason: "failed"; message: string; simulated: boolean; payment?: PaymentRecord }
-  | { ok: false; reason: "bad_token" | "no_receiver" | "limit" | "stale"; message: string };
+  | { ok: false; reason: "bad_token" | "no_receiver" | "limit" | "stale" | "unconfirmed"; message: string };
 
 const STALE_MESSAGE = "Another payment went through while this one was being approved, so nothing was sent. Please check the amount again.";
 
@@ -128,7 +128,7 @@ export async function pay(
   const { duplicate } = await s.append(
     workspace,
     "payment_requested",
-    { ledgerId, target, payee: payeeName(state, target), amountCents, auto: Boolean(opts.auto) },
+    { ledgerId, target, payee: payeeName(state, target), amountCents, auto: Boolean(opts.auto), senderBatchId: `la-${token}`, receiver },
     key,
   );
   if (duplicate) {
@@ -165,8 +165,12 @@ async function send(
   try {
     outcome = await payBatch(senderBatchId, items, { simulateNote });
   } catch (err) {
-    if (err instanceof PayPalUnavailable) return fail(err.message, false);
-    throw err;
+    if (!(err instanceof PayPalUnavailable)) throw err;
+    // PayPal may have acted. Keep the money held and ask again later, with the same batch ID.
+    for (const item of items) {
+      await s.append(workspace, "payment_unconfirmed", { ledgerId: item.ledgerId, message: err.message }, `unconfirmed:${item.ledgerId}`);
+    }
+    return { ok: false, reason: "unconfirmed", message: "PayPal didn't give a clear answer, so this is held until we can confirm it. Please don't send it again." };
   }
   if (outcome.kind === "failed") return fail(`${outcome.code}: ${outcome.message}`, outcome.simulated);
 
@@ -225,7 +229,7 @@ export async function payClaimsInOrder(workspace: string, claimIds: string[], op
     await s.append(
       workspace,
       "payment_requested",
-      { ledgerId, target, payee: payeeName(state, target), amountCents: owed, auto: false },
+      { ledgerId, target, payee: payeeName(state, target), amountCents: owed, auto: false, senderBatchId: `la-${batchToken}`, receiver },
       `pay:${ledgerId}`,
     );
     items.push({ ledgerId, receiver, amountCents: owed, note: `Estate of Ruth Calloway: ${payeeName(state, target)}` });
@@ -240,8 +244,26 @@ export async function payClaimsInOrder(workspace: string, claimIds: string[], op
   return { ok: result.ok as boolean, reason: result.ok ? undefined : ("failed" as const), result };
 }
 
+/** Asks PayPal again about payments with no clear answer. The same batch ID means this can't pay twice. */
+async function retryUnconfirmed(workspace: string, s: Store): Promise<void> {
+  const state = buildState(await s.list(workspace));
+  const waiting = state.payments.filter((p) => p.unconfirmed && p.status === "requested" && p.senderBatchId && p.receiver);
+  const groups = new Map<string, PaymentRecord[]>();
+  for (const p of waiting) groups.set(p.senderBatchId as string, [...(groups.get(p.senderBatchId as string) ?? []), p]);
+  for (const [senderBatchId, group] of groups) {
+    const items: PayoutItem[] = group.map((p) => ({
+      ledgerId: p.ledgerId,
+      receiver: p.receiver as string,
+      amountCents: p.amountCents,
+      note: `Estate of Ruth Calloway: ${p.payee}`,
+    }));
+    await send(s, workspace, senderBatchId, items);
+  }
+}
+
 /** Reads each unfinished payment back from PayPal. PayPal's record decides whether it's paid. */
 export async function syncPayments(workspace: string, s: Store = store()): Promise<void> {
+  await retryUnconfirmed(workspace, s);
   const state = buildState(await s.list(workspace));
   const batches = new Set(state.payments.filter((p) => p.status === "sent" && p.batchId).map((p) => p.batchId as string));
   for (const batchId of batches) {

@@ -34,7 +34,9 @@ export async function payBatch(
 
   const res = await paypal("/v1/payments/payouts", { method: "POST", body, safeToRepeat: true });
 
-  if (res.ok) return { kind: "sent", batchId: res.json.batch_header.payout_batch_id, duplicate: false };
+  const newBatchId: string | undefined = res.json?.batch_header?.payout_batch_id;
+  if (res.ok && newBatchId) return { kind: "sent", batchId: newBatchId, duplicate: false };
+  if (res.ok) throw new PayPalUnavailable("PayPal accepted the payout, but its reply had no batch ID.");
 
   const existing = res.json?.details?.find?.((d: any) => d.issue?.includes("already exists"));
   const href: string | undefined = existing?.link?.[0]?.href;

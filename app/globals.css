@@ -159,3 +159,19 @@ tr.selected td { font-weight: 500; }
   .paper-grid { grid-template-columns: 1fr; }
   .reading-pane { border-left: 0; padding-left: 0; }
 }
+
+/* What to try: a ruled checklist, ticked from what has happened */
+.guide { padding: 16px 0; border-bottom: 1px solid var(--ink); }
+.guide-title { font-family: var(--font-body); font-size: 13px; font-weight: 600; margin: 0 0 8px; color: var(--muted); }
+.guide ol { list-style: none; counter-reset: step; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 24px; }
+.guide li { counter-increment: step; font-size: 14px; display: flex; gap: 8px; }
+.guide li::before { content: counter(step); font-family: var(--font-figures); color: var(--muted); }
+.guide li.done::before { content: "\2713"; color: var(--paid); }
+.guide li a { color: var(--muted); text-decoration: none; }
+.guide li a:hover { text-decoration: underline; }
+.guide li.next a { color: var(--ink); font-weight: 600; text-decoration: underline; }
+.guide li.done a { color: var(--muted); }
+.guide-end { margin: 12px 0 0; font-size: 14px; }
+html { scroll-behavior: auto; }
+section[aria-labelledby], h2[id] { scroll-margin-top: 16px; }
+@media (max-width: 760px) { .guide ol { grid-template-columns: 1fr; } }

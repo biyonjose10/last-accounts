@@ -7,6 +7,7 @@ import type { EstateState, PaymentRecord, Target } from "@/lib/ledger/state";
 import { CarSale } from "./CarSale";
 import { FaultDrill, type Drills } from "./FaultDrill";
 import { Figure } from "./Figure";
+import { Guide } from "./Guide";
 import { MoneyTimeline } from "./MoneyTimeline";
 import { Paperwork } from "./Paperwork";
 
@@ -224,6 +225,8 @@ export function EstateApp({ clientId }: { clientId: string }) {
         <div className="total"><h3>Held back</h3><Figure cents={reserved} /></div>
         <div className="total safe"><h3>Safe to distribute today</h3><Figure cents={plan.distributableNowCents} /></div>
       </div>
+
+      <Guide state={state} />
 
       <section aria-labelledby="send-heading">
         <div className="section-head"><h2 id="send-heading">Pay an heir</h2></div>

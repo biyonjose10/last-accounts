@@ -78,7 +78,7 @@ export function CarSale({
       setRetryOrder(orderId);
       setMessage({
         kind: "fail",
-        text: `${json.simulated ? "Simulated decline. " : ""}${json.message}. No credit was given, and the car stays in the estate.`,
+        text: `${json.simulated ? "Simulated decline. " : ""}${json.message}. No credit has been given, and the car stays in the estate for now.`,
       });
     }
     await refresh.current();

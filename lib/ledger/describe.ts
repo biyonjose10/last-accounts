@@ -24,6 +24,8 @@ export function describe(e: LedgerEvent): RecordLine | null {
       return { who: "PayPal", text: `Payout batch ${d.batchId} accepted.` };
     case "payment_settled":
       return { who: "PayPal", text: `Payment confirmed, transaction ${d.transactionId}. Fee ${usd(d.feeCents ?? 0)}.` };
+    case "payment_unconfirmed":
+      return { who: "PayPal", text: `No clear answer from PayPal: ${d.message} The money stays held, and we'll ask again with the same batch ID, so it can't pay twice.` };
     case "payment_failed":
       return { who: d.simulated ? "Drill" : "PayPal", text: `${d.simulated ? "Simulated failure" : "Payment failed"}: ${d.message}. Nothing left the estate, so it's still owed.` };
     case "date_advanced":
