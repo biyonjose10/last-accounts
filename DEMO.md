@@ -34,3 +34,35 @@ All names are fictional. No real company names or marks appear on screen except 
 - Simulated failures and the date jump are labelled on screen.
 - Cut loading and setup.
 - Recheck the forum's video trademark question before filming.
+
+## How the video is made
+Adapted from sir's METHODOLOGY.md (the CutCheck video). Rules win wherever the two differ.
+
+**Pipeline:** live site → Playwright capture → measured element positions → Remotion animation → silent master → ffmpeg audio → final MP4.
+
+**Kept from the method**
+- 1920×1080, 30 fps, H.264 and AAC, under 3:00 (target 2:50 or less).
+- Playwright walks the real journey on the hosted URL. Laptop frame at 1440×900, 2× density, so zooms stay crisp.
+- `measure.mjs` records element positions, so camera moves and callouts aim at real elements.
+- Remotion renders every frame from its frame number, with spline camera moves through keyframes. Stills of each cut are checked before the final render.
+- One script line per clip, each with a SAY time and a maximum length. Captions (`.srt`) use the same times.
+- Each clip is trimmed, levelled to -16 LUFS and placed on its cue, sped up 1.15× at most. Lines never overlap. Final mix about -14 LUFS, peak below -0.5 dB.
+- Name each tool on screen when it's used. No keys, `.env`, devtools or sandbox passwords on screen. Thumbnail at 1280×720.
+
+**Changed, because our rules or subject require it**
+
+| CutCheck did | We do | Why |
+|---|---|---|
+| Precomputed demo mode | Real runs: live Gemini reads and real sandbox transactions | Sir's rule: never fake a transaction or AI result |
+| Illustrations standing in for results | None | Same rule |
+| Mostly animated screenshots | Recorded live interaction for every money moment; stills only for brief zooms | Rules require footage of the project functioning; organisers want PayPal and AI working end to end |
+| Phone frame | Laptop browser frame | That's the device this is built for |
+| "Demo" chip | "PayPal sandbox" label, plus "Simulated" on fault drills and the date jump, never cropped | Honesty about what's real |
+| Mascot, coral wipes, handheld drift | Slow camera moves, plain cuts or a thin ruled-line wipe in `#14231F` | The subject is a death in the family; matches the ledger look |
+| Pixabay track | No track, or a quiet one we synthesise ourselves | Sir's rule: no copyrighted music. Royalty-free is still copyrighted |
+| Two human readers | Free local AI voice by default; any line can be replaced by sir's own clip | Solo entry; organisers allow AI voiceover |
+| Whole video sped up 12% | Cut waiting instead; speed-up only if a real run still runs long | Keeps real timing believable |
+
+**Keep out of the public repo:** the video project lives in a separate folder, `projects/paypal-ai-hack-video`, so Remotion's own licence stays out of the MIT app repo.
+
+**PayPal login shots:** sir signs in to the sandbox for these takes, unless he decides otherwise.
