@@ -60,31 +60,36 @@
       "id": "P1-1",
       "phase": 1,
       "name": "Payment classes and $6,000 funeral cap match 733.707",
-      "passes": false
+      "passes": true,
+      "evidence": "tests/engine.test.ts, 29 passing"
     },
     {
       "id": "P1-2",
       "phase": 1,
       "name": "Claim window follows 733.702",
-      "passes": false
+      "passes": true,
+      "evidence": "tests/engine.test.ts"
     },
     {
       "id": "P1-3",
       "phase": 1,
       "name": "Gift reduction order follows 733.805",
-      "passes": false
+      "passes": true,
+      "evidence": "tests/engine.test.ts"
     },
     {
       "id": "P1-4",
       "phase": 1,
       "name": "Every block cites its statute",
-      "passes": false
+      "passes": true,
+      "evidence": "tests/engine.test.ts"
     },
     {
       "id": "P1-5",
       "phase": 1,
       "name": "Florida attorney rule checked and pitch wording confirmed",
-      "passes": false
+      "passes": true,
+      "evidence": "Levy County clerk probate packet says a personal representative in formal administration needs an attorney unless sole interested person. Wording: alongside a lawyer. Official rule text not retrieved."
     },
     {
       "id": "P2-1",
