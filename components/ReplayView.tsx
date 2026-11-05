@@ -1,7 +1,8 @@
 "use client";
 
 import { Shell } from "./Shell";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { PaidBadge, Receipt, type ReceiptRef } from "./Receipt";
 import { describe, longDate, usd } from "@/lib/ledger/describe";
 import type { EstateState } from "@/lib/ledger/state";
 
@@ -15,6 +16,8 @@ const PAGES = [
 export function ReplayView() {
   const [data, setData] = useState<{ state: EstateState; recordedAt: string | null } | null>(null);
   const [failed, setFailed] = useState(false);
+  const [receipt, setReceipt] = useState<ReceiptRef | null>(null);
+  const closeReceipt = useCallback(() => setReceipt(null), []);
 
   useEffect(() => {
     fetch("/api/replay")
@@ -48,7 +51,7 @@ export function ReplayView() {
                 <td>{p.payee}</td>
                 <td className="num">{usd(p.amountCents)}</td>
                 <td>{p.auto ? "Agent, within limits" : "Dana"}</td>
-                <td><span className={p.status === "paid" ? "badge paid" : "badge stop"}>{p.status === "paid" ? "Paid" : p.status}</span></td>
+                <td>{p.status === "paid" ? <PaidBadge onOpen={() => setReceipt({ ledgerIds: [p.ledgerId] })} /> : <span className="badge stop">{p.status}</span>}</td>
                 <td className="id">{p.transactionId}</td>
               </tr>
             ))}
@@ -57,7 +60,7 @@ export function ReplayView() {
                 <td>From Tom Calloway, for the car</td>
                 <td className="num">{usd(o.grossCents)}</td>
                 <td>Tom, in PayPal Checkout</td>
-                <td><span className="badge paid">Captured</span></td>
+                <td><PaidBadge label="Captured" onOpen={() => setReceipt({ orderId: o.orderId })} /></td>
                 <td className="id">{o.captureId}</td>
               </tr>
             ))}
@@ -73,6 +76,7 @@ export function ReplayView() {
           })}
         </ol>
       </section>
+      {receipt && <Receipt state={state} receipt={receipt} onClose={closeReceipt} />}
       <footer className="foot"><p>A hackathon demo for use alongside a lawyer. It isn&apos;t legal advice, and the people in it don&apos;t exist.</p></footer>
     </Shell>
   );

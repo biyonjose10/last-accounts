@@ -11,7 +11,7 @@ interface DocEntry {
   incoming: boolean;
 }
 
-export function Paperwork({ state, aiOff, onChange }: { state: EstateState; aiOff: boolean; onChange: () => Promise<void> }) {
+export function Paperwork({ state, aiOff, onChange }: { state: EstateState; aiOff: boolean; onChange: () => Promise<unknown> }) {
   const [docs, setDocs] = useState<DocEntry[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

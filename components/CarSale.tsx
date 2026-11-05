@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usd } from "@/lib/ledger/describe";
 import type { EstateState } from "@/lib/ledger/state";
+import { PaidBadge } from "./Receipt";
 
 declare global {
   interface Window {
@@ -42,11 +43,13 @@ export function CarSale({
   clientId,
   simulateDecline,
   onChange,
+  onReceipt,
 }: {
   state: EstateState;
   clientId: string;
   simulateDecline: boolean;
-  onChange: () => Promise<void>;
+  onChange: () => Promise<unknown>;
+  onReceipt: (orderId: string) => void;
 }) {
   const car = state.facts.otherAssets.find((a) => a.id === "car");
   const captured = state.orders.find((o) => o.status === "captured");
@@ -63,6 +66,8 @@ export function CarSale({
   drill.current = simulateDecline;
   const refresh = useRef(onChange);
   refresh.current = onChange;
+  const showReceipt = useRef(onReceipt);
+  showReceipt.current = onReceipt;
 
   async function capture(orderId: string) {
     const res = await fetch("/api/order/capture", {
@@ -74,6 +79,9 @@ export function CarSale({
     if (json.ok) {
       setRetryOrder(null);
       setMessage({ kind: "ok", text: "Payment captured. The estate now holds cash in place of the car." });
+      await refresh.current();
+      showReceipt.current(orderId);
+      return;
     } else {
       setRetryOrder(orderId);
       setMessage({
@@ -139,7 +147,7 @@ export function CarSale({
       <div className="section-head"><h2 id="car-heading">Tom wants to keep the car</h2></div>
       {captured ? (
         <p className="section-note">
-          <span className="badge paid">Sold to Tom</span> {usd(captured.grossCents)} paid, {usd(captured.feeCents ?? 0)} PayPal fee, {usd(captured.netCents ?? 0)} reached the estate. Capture <span className="id">{captured.captureId}</span>
+          <PaidBadge label="Sold to Tom" onOpen={() => onReceipt(captured.orderId)} /> {usd(captured.grossCents)} paid, {usd(captured.feeCents ?? 0)} PayPal fee, {usd(captured.netCents ?? 0)} reached the estate. Capture <span className="id">{captured.captureId}</span>
         </p>
       ) : (
         <>

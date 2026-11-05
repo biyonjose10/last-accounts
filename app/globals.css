@@ -347,3 +347,66 @@ dl.totals .safe dt { color: var(--paid-deep); font-weight: 600; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
 }
+
+/* ---------- Receipts ---------- */
+.badge.as-button { gap: 6px; cursor: pointer; font-family: var(--font-body), sans-serif; transition: background-color 160ms, box-shadow 160ms; }
+.badge.as-button svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linejoin: round; }
+.badge.as-button:hover { box-shadow: inset 0 0 0 1px var(--paid); }
+
+@keyframes backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes print {
+  from { clip-path: inset(0 0 100% 0); transform: translateY(-16px); }
+  to { clip-path: inset(0 0 0 0); transform: none; }
+}
+.receipt-backdrop {
+  position: fixed; inset: 0; z-index: 50; display: flex; padding: 24px; overflow-y: auto; overscroll-behavior: contain;
+  background: rgb(20 35 31 / 0.45); animation: backdrop-in 200ms ease-out;
+}
+.receipt {
+  --paper-w: #ffffff;
+  position: relative; flex: none; width: min(380px, 100%); margin: auto;
+  filter: drop-shadow(0 18px 30px rgb(20 35 31 / 0.28)); animation: print 700ms var(--ease);
+}
+.receipt > div { background: var(--paper-w); }
+.receipt-top { padding: 30px 28px 18px; border-radius: 16px 16px 0 0; text-align: center; }
+.receipt-icon { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; }
+.receipt-icon svg { width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.receipt-icon.paid { background: var(--paid); }
+.receipt-icon.stop { background: var(--stop); }
+.receipt-icon.waiting { background: var(--held); }
+.receipt-icon.waiting svg { stroke: var(--ink); }
+.receipt-top h3 { margin: 12px 0 6px; font-family: var(--font-display), Georgia, serif; font-weight: 400; font-size: 26px; line-height: 1.15; }
+.receipt-top p { margin: 0; font-size: 14px; color: var(--muted); }
+
+/* The tear line, with a half-circle bitten out of each side. */
+.receipt > .receipt-tear {
+  position: relative; height: 22px; background:
+    radial-gradient(circle at 0 50%, transparent 11px, var(--paper-w) 11.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent 11px, var(--paper-w) 11.5px) right / 51% 100% no-repeat;
+}
+.receipt-tear::after { content: ""; position: absolute; left: 22px; right: 22px; top: 50%; border-top: 2px dashed var(--rule); }
+
+.receipt-body { padding: 10px 28px 18px; }
+.receipt-lines { margin: 0 0 14px; padding: 0; list-style: none; font-size: 14px; }
+.receipt-lines li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px dotted var(--rule); }
+.receipt-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 0; }
+.receipt-fields div:nth-child(even) { text-align: right; }
+.receipt-fields dt { font-size: 12px; color: var(--muted); }
+.receipt-fields dd { margin: 2px 0 0; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.receipt-method { margin: 16px 0 0; padding: 10px 12px; border-radius: 10px; background: #eef2ef; font-size: 13.5px; }
+
+.receipt-code { padding: 14px 28px 12px; border-top: 2px dashed var(--edge); text-align: center; }
+.bars { display: block; width: 100%; height: 46px; fill: var(--ink); }
+.receipt-code .id { margin: 6px 0 0; }
+
+/* The bottom edge: scalloped, like a ticket torn from the roll. */
+.receipt > .receipt-edge {
+  height: 12px; background: radial-gradient(circle at 50% 100%, transparent 7px, var(--paper-w) 7.5px) 0 0 / 22px 12px repeat-x;
+}
+.receipt-close {
+  position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 34px; height: 34px;
+  border: 0; border-radius: 50%; background: transparent; color: var(--muted); transition: background-color 160ms;
+}
+.receipt-close:hover { background: #eef2ef; }
+.receipt-close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.receipt:focus { outline: none; }

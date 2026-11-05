@@ -13,6 +13,7 @@ import { Paperwork } from "./Paperwork";
 import { CashBridge } from "./CashBridge";
 import { Segmented } from "./Segmented";
 import { Shell, type NavItem } from "./Shell";
+import { PaidBadge, Receipt, type ReceiptRef } from "./Receipt";
 
 const NAV: NavItem[] = [
   { href: "#overview", label: "Overview" },
@@ -72,9 +73,9 @@ function Citation({ block }: { block: Block }) {
   );
 }
 
-function PaymentState({ payment }: { payment?: PaymentRecord }) {
+function PaymentState({ payment, onOpen }: { payment?: PaymentRecord; onOpen: (ledgerId: string) => void }) {
   if (!payment) return null;
-  if (payment.status === "paid") return <span className="badge paid">Paid</span>;
+  if (payment.status === "paid") return <PaidBadge onOpen={() => onOpen(payment.ledgerId)} />;
   if (payment.status === "failed") return <span className="badge stop">Failed, still owed</span>;
   return <span className="badge sent">{payment.paypalStatus ? `PayPal: ${payment.paypalStatus.toLowerCase()}` : "Sent to PayPal"}</span>;
 }
@@ -90,11 +91,15 @@ export function EstateApp({ clientId }: { clientId: string }) {
   const [notice, setNotice] = useState<{ kind: "ok" | "fail"; text: string; replay?: boolean } | null>(null);
 
   const [drills, setDrills] = useState<Drills>({ failNextPayout: false, declineNextCapture: false, aiOff: false });
+  const [receipt, setReceipt] = useState<ReceiptRef | null>(null);
+  const closeReceipt = useCallback(() => setReceipt(null), []);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (): Promise<EstateState> => {
     const res = await fetch("/api/estate", { cache: "no-store" });
     if (!res.ok) throw new Error("The ledger couldn't be loaded.");
-    setState(await res.json());
+    const next: EstateState = await res.json();
+    setState(next);
+    return next;
   }, []);
 
   useEffect(() => {
@@ -140,6 +145,7 @@ export function EstateApp({ clientId }: { clientId: string }) {
     setBusy(true);
     setNotice(null);
     try {
+      const before = new Set(state?.payments.map((p) => p.ledgerId));
       const res = await post("/api/pay", { target, amountCents, token, version, drill: drill || drills.failNextPayout });
       if (drills.failNextPayout) setDrills((d) => ({ ...d, failNextPayout: false }));
       if (res.json.ok) {
@@ -155,7 +161,11 @@ export function EstateApp({ clientId }: { clientId: string }) {
       }
       setCheck(null);
       setAmount("");
-      await refresh();
+      const next = await refresh();
+      if (res.json.ok) {
+        const made = next.payments.find((p) => !before.has(p.ledgerId) && p.target.kind === "heir" && p.target.id === target.id);
+        if (made) setReceipt({ ledgerIds: [made.ledgerId] });
+      }
     } catch {
       setNotice({ kind: "fail", text: "We lost contact while sending. Nothing is marked paid until PayPal confirms it." });
     } finally {
@@ -168,6 +178,7 @@ export function EstateApp({ clientId }: { clientId: string }) {
     setNotice(null);
     setCheck(null);
     try {
+      const before = new Set(state?.payments.map((p) => p.ledgerId));
       const res = await post("/api/pay-claims", { claimIds: ids });
       setNotice(
         res.json.ok
@@ -179,7 +190,11 @@ export function EstateApp({ clientId }: { clientId: string }) {
             },
       );
       setAmount("");
-      await refresh();
+      const next = await refresh();
+      if (res.json.ok) {
+        const made = next.payments.filter((p) => !before.has(p.ledgerId) && p.target.kind === "claim");
+        if (made.length > 0) setReceipt({ ledgerIds: made.map((p) => p.ledgerId) });
+      }
     } finally {
       setBusy(false);
     }
@@ -352,7 +367,7 @@ export function EstateApp({ clientId }: { clientId: string }) {
                   <td className="num">{usd(h.entitledCents)}</td>
                   <td className="num">{usd(h.distributedCents)}</td>
                   <td className="num">{usd(h.safeNowCents)}</td>
-                  <td className="hide-sm"><PaymentState payment={p} />{p?.transactionId && <span className="id">{p.transactionId}</span>}</td>
+                  <td className="hide-sm"><PaymentState payment={p} onOpen={(id) => setReceipt({ ledgerIds: [id] })} />{p?.transactionId && <span className="id">{p.transactionId}</span>}</td>
                 </tr>
               );
             })}
@@ -380,7 +395,7 @@ export function EstateApp({ clientId }: { clientId: string }) {
                   <td>{l.creditor}{l.class === 8 && l.claimId === "funeral" ? <span className="reason">Above the $6,000 funeral cap, so this part ranks last.</span> : null}</td>
                   <td className="num">{usd(l.amountCents)}</td>
                   <td>
-                    {l.status === "paid" && <span className="badge paid">Paid</span>}
+                    {l.status === "paid" && (p ? <PaidBadge onOpen={() => setReceipt({ ledgerIds: [p.ledgerId] })} /> : <span className="badge paid">Paid</span>)}
                     {l.status === "payable" && (p?.status === "failed" ? <span className="badge stop">Failed, still owed</span> : <span className="badge owed">Owed</span>)}
                     {l.status === "held" && <span className="badge held">Reserved, not paid</span>}
                     {l.status === "barred" && <span className="badge stop">Out of time</span>}
@@ -410,7 +425,7 @@ export function EstateApp({ clientId }: { clientId: string }) {
         <MoneyTimeline state={state} />
       </section>
 
-      <CarSale state={state} clientId={clientId} simulateDecline={drills.declineNextCapture} onChange={refresh} />
+      <CarSale state={state} clientId={clientId} simulateDecline={drills.declineNextCapture} onChange={refresh} onReceipt={(orderId) => setReceipt({ orderId })} />
 
       <Paperwork state={state} aiOff={drills.aiOff} onChange={refresh} />
 
@@ -429,6 +444,8 @@ export function EstateApp({ clientId }: { clientId: string }) {
           </ol>
         )}
       </section>
+
+      {receipt && <Receipt state={state} receipt={receipt} onClose={closeReceipt} />}
 
       <footer className="foot">
         <p>A hackathon demo using one state&apos;s rules, for use alongside a lawyer. It isn&apos;t legal advice, and the people in it don&apos;t exist.</p>
