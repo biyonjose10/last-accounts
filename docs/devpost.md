@@ -133,7 +133,7 @@ If the AI is off in the drill, new letters wait for Dana. If it is rate limited 
 
 ## Testing instructions for judges
 
-Hosted demo: https://last-accounts.vercel.app (no sign-up). Video: https://youtu.be/5mAcu4hqyko.
+Hosted demo: https://last-accounts.vercel.app (no sign-up). Video: https://youtu.be/NApsN6HyijQ.
 
 It's all fake money in the PayPal sandbox, and the estate is fictional. Use a desktop browser. To buy the car, sign in to the PayPal window as Tom:
 

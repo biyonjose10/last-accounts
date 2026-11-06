@@ -3,7 +3,7 @@
 Last Accounts stops the person settling a parent's estate from paying the wrong person first. AI (Google Gemini) reads the paperwork, plain code decides who may be paid and how much, and PayPal moves the money.
 
 - **Hosted demo:** https://last-accounts.vercel.app
-- **Video:** https://youtu.be/5mAcu4hqyko
+- **Video:** https://youtu.be/NApsN6HyijQ
 
 ## The problem
 
