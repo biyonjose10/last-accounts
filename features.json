@@ -196,7 +196,8 @@
       "id": "P4-3",
       "phase": 4,
       "name": "Capture failure gives no credit and offers retry",
-      "passes": false
+      "passes": true,
+      "evidence": "Hosted run 6 Nov: decline drill on, capture refused with no credit and Retry offered; drill off, retry captured 35782101HG741804C ($6,400, fee $223.85)"
     },
     {
       "id": "P4-4",
