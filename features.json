@@ -259,7 +259,8 @@
       "id": "P6-3",
       "phase": 6,
       "name": "Licence shows on the GitHub repo page",
-      "passes": false
+      "passes": true,
+      "evidence": "Repo made public 6 Nov 2026 on sir's yes; GitHub detects MIT License (gh repo view, and shown on the logged-out page)"
     },
     {
       "id": "P6-4",

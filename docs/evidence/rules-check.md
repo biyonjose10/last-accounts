@@ -18,7 +18,7 @@ Checked 6 Nov 2026 against https://paypalaihackathon.devpost.com (home, `/rules`
 | Text description | Met | `docs/devpost.md` |
 | Tools used and how | Met | `docs/devpost.md`, "Tools explanation" |
 | Testing instructions with login credentials | Met | Tom's sandbox login in `README.md` and `docs/devpost.md` |
-| Public open-source repo, licence visible | Not yet | MIT `LICENSE` present; repo is private until sir approves |
+| Public open-source repo, licence visible | Met | Public since 6 Nov; GitHub shows MIT License in About |
 | Video under 3:00 on YouTube, public, showing it working | Met | https://youtu.be/5mAcu4hqyko (2:45, Public, published 6 Nov) |
 | No third-party trademarks or copyrighted music in the video | Plan | No music track. PayPal shown only as the required integration; forum question unanswered |
 | Bryntum prize: uses a Bryntum tool | Met | `@bryntum/scheduler-community` 8.0.0 (MIT), money timeline |
