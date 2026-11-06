@@ -280,13 +280,15 @@
       "id": "P7-1",
       "phase": 7,
       "name": "Video under 3:00 with every claim checked against the build",
-      "passes": false
+      "passes": true,
+      "evidence": "Video https://youtu.be/5mAcu4hqyko, 2:45, Public, captions; built on the 6 Nov real run, every line checked against footage"
     },
     {
       "id": "P8-1",
       "phase": 8,
       "name": "Live rules and submission form checked item by item",
-      "passes": false
+      "passes": true,
+      "evidence": "Live rules re-read 6 Nov (docs/evidence/rules-check.md); submitted on Devpost 6 Nov: https://devpost.com/software/last-accounts"
     }
   ]
 }
