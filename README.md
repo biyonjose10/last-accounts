@@ -25,8 +25,8 @@ This is a demonstration of one state's rules, for use alongside a lawyer. It is 
 
 You need a desktop browser and this sandbox login for Tom, the brother who buys the car:
 
-- Email: `TOM_SANDBOX_EMAIL`
-- Password: `TOM_SANDBOX_PASSWORD`
+- Email: `tom.lastaccounts@personal.example.com`
+- Password: `abcdefgh`
 
 Steps:
 

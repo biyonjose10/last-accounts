@@ -137,8 +137,8 @@ Hosted demo: https://last-accounts.vercel.app (no sign-up). Video: VIDEO_URL.
 
 It's all fake money in the PayPal sandbox, and the estate is fictional. Use a desktop browser. To buy the car, sign in to the PayPal window as Tom:
 
-- Email: `TOM_SANDBOX_EMAIL`
-- Password: `TOM_SANDBOX_PASSWORD`
+- Email: `tom.lastaccounts@personal.example.com`
+- Password: `abcdefgh`
 
 Steps, in about 3 minutes:
 
