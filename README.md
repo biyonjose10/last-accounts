@@ -223,7 +223,7 @@ npm test
 npm run typecheck
 ```
 
-`npm test` runs 85 tests in `tests/`. They call neither PayPal nor Gemini for real, so they need no keys.
+`npm test` runs 89 tests in `tests/`. They call neither PayPal nor Gemini for real, so they need no keys.
 
 ### Scripts
 

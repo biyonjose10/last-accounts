@@ -38,7 +38,7 @@ There are three layers, and only one of them can move money:
 2. **Code decides.** `lib/engine` is pure functions with no network access. It applies Florida's payment classes, claim window and gift reduction order, and every block cites its source.
 3. **PayPal moves it.** `lib/payments` is the only path to a payout. It runs the engine again at the moment of payment.
 
-The ledger is an append-only list of events, and the state on screen is rebuilt from it. Figures that change stay on the page, struck through, like corrections in a court accounts book. 85 automated tests cover the engine, payments, limits and AI validation.
+The ledger is an append-only list of events, and the state on screen is rebuilt from it. Figures that change stay on the page, struck through, like corrections in a court accounts book. 89 automated tests cover the engine, payments, limits and AI validation.
 
 ## How PayPal is used
 
@@ -150,6 +150,8 @@ Steps, in about 3 minutes:
 6. At the top, switch the date to **After the window (simulated)**. On the Northgate row, click **Nothing was filed in court by the deadline: release this reserve**.
 7. In **Pay an heir**, pay Aoife Calloway, Dana Calloway and Tom Calloway in turn: **Send payment**, then **Approve**. Wait for each to confirm.
 8. The chart at the top becomes **Where the money went**. In the sidebar, click **Final account**. Each line is read back from PayPal.
+
+The figures in the video differ slightly from a fresh estate: in the filmed estate Tom bought the car before his first payment, so there was more cash and his safe amount was $9,329.96. The steps are the same.
 
 Optional: use **Fault drill** before the matching step. Each failure is labelled as simulated. If you use **Decline the car payment at capture**, turn it off before clicking **Retry the capture**.
 
